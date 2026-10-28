@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up · Farm to Table Tracked</title>
+  <meta name="description" content="Sign up as a farmer or a shopper to track produce from harvest to kitchen.">
+
+  <!-- Google Fonts: Fraunces, Gaegu, Plus Jakarta Sans, Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Gaegu:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pine: '#10443e',
+            sage: '#32745c',
+            seafoam: '#62a29a',
+            ochre: '#b29361',
+            linen: '#ede4d6',
+            paper: '#fbf9f4',
+            paperDark: '#f2ece1'
+          },
+          fontFamily: {
+            display: ['"Fraunces"', 'serif'],
+            doodle: ['"Gaegu"', 'cursive', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"Space Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="lucide.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-full flex flex-col font-sans antialiased text-pine selection:bg-seafoam selection:text-white">
+
+  <!-- Top Simple Navigation Strip -->
+  <header class="border-b-2 border-pine bg-[#f9f6f0] px-4 sm:px-6 lg:px-8 py-3 sticky top-0 z-40">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand Logo linking to Landing Page -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-pine text-linen flex items-center justify-center border-2 border-pine shadow-[3px_3px_0px_#b29361] group-hover:scale-105 transition">
+          <i data-lucide="sprout" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-display text-xl font-bold tracking-tight text-pine">Farm to Table</span>
+            <span class="font-doodle text-sm text-sage font-bold bg-[#ede4d6] px-2 py-0.5 rounded-full border border-pine">Sign Up</span>
+          </div>
+          <span class="text-[10px] font-mono uppercase tracking-wider text-ochre font-bold block">HCL JIGSAW Edition 7 &bull; Grade 9</span>
+        </div>
+      </a>
+
+      <!-- Link back to Landing Page -->
+      <a href="index.html" class="hand-btn-secondary px-3.5 py-1.5 text-xs font-bold flex items-center gap-1.5">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+        <span>Landing Page</span>
+      </a>
+
+    </div>
+  </header>
+
+  <!-- Main Sign Up Form Container -->
+  <main class="flex-1 max-w-2xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+
+    <div class="hand-card p-6 sm:p-10 bg-white relative space-y-6">
+      
+      <!-- Header Intro -->
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f2ece1] border border-pine text-xs font-mono font-bold text-pine">
+          <span>Choose Account Type</span>
+          <span class="text-ochre">&bull;</span>
+          <span>Instant Access</span>
+        </div>
+        
+        <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-pine">
+          Create Your Account
+        </h1>
+        <p class="text-xs sm:text-sm text-pine/75 max-w-md mx-auto">
+          Are you a farmer logging fresh harvests, or a shopper inspecting produce quality with your smartphone?
+        </p>
+      </div>
+
+      <!-- Segmented Role Selector -->
+      <div class="grid grid-cols-2 gap-3 p-1.5 bg-[#ede4d6] border-2 border-pine rounded-2xl shadow-inner">
+        <button id="tab-farmer-btn" onclick="selectRole('farmer')" type="button" class="py-3 px-4 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition border-2 border-pine bg-pine text-white shadow-[3px_3px_0px_#b29361]">
+          <span>👨🏽‍🌾</span>
+          <span>Farmer Sign Up</span>
+        </button>
+
+        <button id="tab-shopper-btn" onclick="selectRole('shopper')" type="button" class="py-3 px-4 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition border-2 border-transparent text-pine hover:bg-white/60">
+          <span>🛒</span>
+          <span>Shopper Sign Up</span>
+        </button>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- FORM 1: FARMER SIGN UP (SUPER SIMPLE CUZ FARMERS)        -->
+      <!-- ======================================================== -->
+      <div id="section-farmer-form" class="space-y-5">
+        <div class="p-3.5 rounded-xl bg-[#f7f3ec] border border-pine text-xs text-pine/80 flex items-start gap-2.5">
+          <i data-lucide="info" class="w-4 h-4 text-sage shrink-0 mt-0.5"></i>
+          <div>
+            <strong class="font-bold text-pine">Farmer Portal:</strong> Generates instant, ₹0.02 printable QR tags stamped with the 4 compulsory tracking points (<span class="font-mono font-bold">Batch ID</span>, <span class="font-mono font-bold">Quantity</span>, <span class="font-mono font-bold">Harvest Place &amp; Date</span>, <span class="font-mono font-bold">Freshness Level</span>).
+          </div>
+        </div>
+
+        <form id="farmer-signup-form" class="space-y-4" onsubmit="event.preventDefault(); submitFarmerSignup();">
+          
+          <!-- Farmer Name -->
+          <div class="space-y-1">
+            <label class="text-xs font-mono font-bold text-pine block">
+              1. Your Full Name *
+            </label>
+            <input type="text" id="signup-farmer-name" required value="Ramesh Patil" placeholder="e.g. Ramesh Patil" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-sm font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+          </div>
+
+          <!-- Mobile Number -->
+          <div class="space-y-1">
+            <label class="text-xs font-mono font-bold text-pine block">
+              2. Mobile Phone Number (for WhatsApp Crate Alerts) *
+            </label>
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-xs text-pine bg-[#ede4d6] border-2 border-pine px-3 py-2.5 rounded-xl shrink-0">+91</span>
+              <input type="tel" id="signup-farmer-phone" required value="98230 45678" placeholder="10-digit mobile number" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-sm font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+            </div>
+          </div>
+
+          <!-- Farm Village & District -->
+          <div class="space-y-1">
+            <label class="text-xs font-mono font-bold text-pine block">
+              3. Farm Location (Village, District, State) *
+            </label>
+            <input type="text" id="signup-farmer-place" required value="Dindori Taluka, Nashik, Maharashtra" placeholder="Village, District" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-sm font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Primary Crop -->
+            <div class="space-y-1">
+              <label class="text-xs font-mono font-bold text-pine block">
+                4. Primary Crop Grown:
+              </label>
+              <select id="signup-farmer-crop" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-xs font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+                <option value="Vine Tomatoes" selected>🍅 Vine Tomatoes</option>
+                <option value="Mountain Baby Spinach">🥬 Mountain Baby Spinach</option>
+                <option value="Crisp Bell Peppers">🫑 Crisp Bell Peppers</option>
+                <option value="Red Onions">🧅 Red Onions</option>
+                <option value="Farm Fresh Potatoes">🥔 Farm Fresh Potatoes</option>
+                <option value="Organic Carrots">🥕 Organic Carrots</option>
+              </select>
+            </div>
+
+            <!-- Cooperative / Mandi ID -->
+            <div class="space-y-1">
+              <label class="text-xs font-mono font-bold text-pine block">
+                Cooperative / Mandi ID:
+              </label>
+              <input type="text" id="signup-farmer-coop" value="Nashik APMC #4091" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-xs font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full py-4 px-6 hand-btn-primary text-base flex items-center justify-center gap-2 font-bold mt-2 shadow-[4px_4px_0px_#b29361]">
+            <span>Create Farmer Account &amp; Launch Farmer App</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+
+          <!-- 1-Click Demo Shortcut -->
+          <button type="button" onclick="quickLogin('farmer')" class="w-full py-2.5 px-4 hand-btn-secondary text-xs font-mono font-bold flex items-center justify-center gap-2">
+            <span>⚡ Quick Demo: Sign in as Ramesh Patil (Farmer)</span>
+          </button>
+
+        </form>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- FORM 2: SHOPPER SIGN UP                                  -->
+      <!-- ======================================================== -->
+      <div id="section-shopper-form" class="hidden space-y-5">
+        <div class="p-3.5 rounded-xl bg-[#e6ede8] border border-sage text-xs text-pine/80 flex items-start gap-2.5">
+          <i data-lucide="scan" class="w-4 h-4 text-sage shrink-0 mt-0.5"></i>
+          <div>
+            <strong class="font-bold text-pine">Shopper Scanner:</strong> Scan vegetable crates with your camera to decode the 4 compulsory tracking points (<span class="font-mono font-bold">Batch ID</span>, <span class="font-mono font-bold">Quantity</span>, <span class="font-mono font-bold">Harvest Place &amp; Date</span>, <span class="font-mono font-bold">Freshness Level</span>).
+          </div>
+        </div>
+
+        <form id="shopper-signup-form" class="space-y-4" onsubmit="event.preventDefault(); submitShopperSignup();">
+          
+          <!-- Shopper Name -->
+          <div class="space-y-1">
+            <label class="text-xs font-mono font-bold text-pine block">
+              1. Your Full Name *
+            </label>
+            <input type="text" id="signup-shopper-name" required value="Priya Sharma" placeholder="e.g. Priya Sharma" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-sm font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+          </div>
+
+          <!-- Email or Phone -->
+          <div class="space-y-1">
+            <label class="text-xs font-mono font-bold text-pine block">
+              2. Email or Phone Number *
+            </label>
+            <input type="text" id="signup-shopper-contact" required value="priya.sharma@gmail.com" placeholder="Email or 10-digit mobile" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-sm font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+          </div>
+
+          <!-- City / Locality -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <label class="text-xs font-mono font-bold text-pine block">
+                3. City / Area *
+              </label>
+              <input type="text" id="signup-shopper-city" required value="Kothrud, Pune, Maharashtra" placeholder="City or Locality" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-xs font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-xs font-mono font-bold text-pine block">
+                Weekly Grocery Style:
+              </label>
+              <select id="signup-shopper-diet" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-xs font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+                <option value="Daily Fresh Mandi Shopper" selected>Daily Fresh Mandi Shopper</option>
+                <option value="Organic Weekly Household">Organic Weekly Household</option>
+                <option value="Supermarket Farm Shopper">Supermarket Farm Shopper</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full py-4 px-6 hand-btn-primary text-base flex items-center justify-center gap-2 font-bold mt-2 shadow-[4px_4px_0px_#b29361]">
+            <span>Create Shopper Account &amp; Launch Scanner</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+
+          <!-- 1-Click Demo Shortcut -->
+          <button type="button" onclick="quickLogin('shopper')" class="w-full py-2.5 px-4 hand-btn-secondary text-xs font-mono font-bold flex items-center justify-center gap-2">
+            <span>⚡ Quick Demo: Sign in as Priya Sharma (Shopper)</span>
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Footer Info inside card -->
+      <div class="border-t border-pine/15 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-pine/70 gap-2">
+        <span>Already have an account?</span>
+        <div class="flex items-center gap-3">
+          <a href="farmer.html" class="font-bold text-sage underline">Farmer Login</a>
+          <span>&bull;</span>
+          <a href="shopper.html" class="font-bold text-sage underline">Shopper Scanner</a>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Sound engine and authentication handling -->
+  <script>
+    // Audio synthesizer for click/success
+    function playAudioTone(freq = 523, duration = 0.08) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function selectRole(role) {
+      playAudioTone(600, 0.05);
+      const farmerTab = document.getElementById('tab-farmer-btn');
+      const shopperTab = document.getElementById('tab-shopper-btn');
+      const farmerSection = document.getElementById('section-farmer-form');
+      const shopperSection = document.getElementById('section-shopper-form');
+
+      if (role === 'farmer') {
+        farmerTab.className = "py-3 px-4 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition border-2 border-pine bg-pine text-white shadow-[3px_3px_0px_#b29361]";
+        shopperTab.className = "py-3 px-4 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition border-2 border-transparent text-pine hover:bg-white/60";
+        farmerSection.classList.remove('hidden');
+        shopperSection.classList.add('hidden');
+      } else {
+        shopperTab.className = "py-3 px-4 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition border-2 border-pine bg-pine text-white shadow-[3px_3px_0px_#b29361]";
+        farmerTab.className = "py-3 px-4 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition border-2 border-transparent text-pine hover:bg-white/60";
+        shopperSection.classList.remove('hidden');
+        farmerSection.classList.add('hidden');
+      }
+    }
+
+    function submitFarmerSignup() {
+      playAudioTone(784, 0.12);
+      const name = document.getElementById('signup-farmer-name').value.trim() || "Ramesh Patil";
+      const phone = document.getElementById('signup-farmer-phone').value.trim();
+      const place = document.getElementById('signup-farmer-place').value.trim() || "Dindori, Nashik";
+      const crop = document.getElementById('signup-farmer-crop').value;
+      const coop = document.getElementById('signup-farmer-coop').value.trim();
+
+      const user = {
+        role: 'farmer',
+        name: name,
+        phone: phone,
+        place: place,
+        crop: crop,
+        coop: coop,
+        id: 'FRM-' + Math.floor(1000 + Math.random() * 9000)
+      };
+
+      localStorage.setItem('ftt_current_user', JSON.stringify(user));
+      window.location.href = 'farmer.html';
+    }
+
+    function submitShopperSignup() {
+      playAudioTone(784, 0.12);
+      const name = document.getElementById('signup-shopper-name').value.trim() || "Priya Sharma";
+      const contact = document.getElementById('signup-shopper-contact').value.trim();
+      const city = document.getElementById('signup-shopper-city').value.trim() || "Pune";
+      const diet = document.getElementById('signup-shopper-diet').value;
+
+      const user = {
+        role: 'shopper',
+        name: name,
+        contact: contact,
+        city: city,
+        diet: diet,
+        id: 'SHP-' + Math.floor(1000 + Math.random() * 9000)
+      };
+
+      localStorage.setItem('ftt_current_user', JSON.stringify(user));
+      window.location.href = 'shopper.html';
+    }
+
+    function quickLogin(role) {
+      playAudioTone(650, 0.08);
+      if (role === 'farmer') {
+        const user = {
+          role: 'farmer',
+          name: 'Ramesh Patil',
+          phone: '98230 45678',
+          place: 'Dindori Taluka, Nashik, Maharashtra',
+          crop: 'Vine Tomatoes',
+          coop: 'Nashik APMC #4091',
+          id: 'MH-NSK-4091'
+        };
+        localStorage.setItem('ftt_current_user', JSON.stringify(user));
+        window.location.href = 'farmer.html';
+      } else {
+        const user = {
+          role: 'shopper',
+          name: 'Priya Sharma',
+          contact: 'priya.sharma@gmail.com',
+          city: 'Kothrud, Pune, Maharashtra',
+          diet: 'Daily Fresh Mandi Shopper',
+          id: 'SHP-9122'
+        };
+        localStorage.setItem('ftt_current_user', JSON.stringify(user));
+        window.location.href = 'shopper.html';
+      }
+    }
+
+    // Read URL query parameter: ?role=shopper or ?role=farmer
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      const params = new URLSearchParams(window.location.search);
+      const requestedRole = params.get('role');
+      if (requestedRole === 'shopper') {
+        selectRole('shopper');
+      } else {
+        selectRole('farmer');
+      }
+    });
+  </script>
+</body>
+</html>

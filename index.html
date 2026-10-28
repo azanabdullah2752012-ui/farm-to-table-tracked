@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm to Table Tracked · HCL JIGSAW Edition 7</title>
+  <meta name="description" content="Connecting farm soil to consumer kitchen. Instant QR tags and honest freshness tracking for Indian agriculture.">
+
+  <!-- Google Fonts: Fraunces, Gaegu, Plus Jakarta Sans, Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Gaegu:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pine: '#10443e',
+            sage: '#32745c',
+            seafoam: '#62a29a',
+            ochre: '#b29361',
+            linen: '#ede4d6',
+            paper: '#fbf9f4',
+            paperDark: '#f2ece1'
+          },
+          fontFamily: {
+            display: ['"Fraunces"', 'serif'],
+            doodle: ['"Gaegu"', 'cursive', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"Space Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Local Standalone Scripts -->
+  <script src="lucide.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-full flex flex-col font-sans antialiased text-pine selection:bg-seafoam selection:text-white">
+
+  <!-- TOP COMPETITION STRIP -->
+  <div class="border-b-2 border-pine bg-[#e5dbc9] px-4 py-2 text-xs font-mono text-pine flex flex-wrap items-center justify-between gap-3 sticky top-0 z-50">
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-pine font-bold text-[11px] shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-sage animate-ping"></span>
+        HCL JIGSAW Edition 7
+      </span>
+      <span class="font-medium hidden sm:inline">Grade 9 · Robotics, Automation &amp; Smart Manufacturing</span>
+    </div>
+    
+    <div class="flex items-center gap-3 text-xs">
+      <a href="farmer.html" class="hover:underline font-bold text-sage">👨🏽‍🌾 Farmer App</a>
+      <span>&bull;</span>
+      <a href="shopper.html" class="hover:underline font-bold text-sage">🛒 Shopper App</a>
+      <span>&bull;</span>
+      <a href="signup.html" class="px-2.5 py-0.5 rounded-lg bg-white border border-pine hover:bg-paper font-bold text-pine shadow-[2px_2px_0px_#10443e] transition">
+        Sign Up &rarr;
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN LANDING NAVIGATION BAR -->
+  <header class="border-b-2 border-pine bg-[#f9f6f0] px-4 sm:px-6 lg:px-8 py-3.5 sticky top-[37px] z-40">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-pine text-linen flex items-center justify-center border-2 border-pine shadow-[3px_3px_0px_#b29361] group-hover:scale-105 transition">
+          <i data-lucide="sprout" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-display text-xl font-bold tracking-tight text-pine">Farm to Table</span>
+            <span class="font-doodle text-lg text-sage font-bold bg-[#ede4d6] px-2 py-0.5 rounded-full border border-pine rotate-[-2deg]">Tracked</span>
+          </div>
+          <span class="text-[10px] font-mono uppercase tracking-wider text-ochre font-bold block">Smart Agri Supply Chain &bull; Grade 9</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-6 text-xs font-bold font-mono">
+        <a href="#standards" class="text-pine/80 hover:text-pine transition">The 4 Standards</a>
+        <a href="#how-it-works" class="text-pine/80 hover:text-pine transition">How It Works</a>
+        <a href="#calculator" class="text-pine/80 hover:text-pine transition">₹2.1L Cr Math</a>
+        <a href="#pitch" class="text-pine/80 hover:text-pine transition">Pitch</a>
+      </nav>
+
+      <!-- Sign Up Direct Actions in Nav -->
+      <div class="flex items-center gap-2">
+        <a href="signup.html?role=farmer" class="hand-btn-secondary px-3 py-1.5 text-xs font-bold hidden sm:inline-flex items-center gap-1">
+          <span>👨🏽‍🌾 Farmer</span>
+        </a>
+        <a href="signup.html?role=shopper" class="hand-btn-secondary px-3 py-1.5 text-xs font-bold hidden sm:inline-flex items-center gap-1">
+          <span>🛒 Shopper</span>
+        </a>
+        <a href="signup.html" class="hand-btn-primary px-3.5 py-1.5 text-xs font-bold flex items-center gap-1 shadow-[2px_2px_0px_#10443e]">
+          <span>Sign Up</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN LANDING CONTENT -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-16">
+
+    <!-- ======================================================== -->
+    <!-- 1. HERO SECTION (START: DIRECT SIGN UP BUTTONS)          -->
+    <!-- ======================================================== -->
+    <section class="hand-card p-8 sm:p-12 lg:p-16 bg-white relative overflow-hidden space-y-8">
+      
+      <div class="max-w-3xl space-y-4">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f2ece1] border border-pine text-xs font-mono font-bold text-pine">
+          <span>HCL JIGSAW Edition 7</span>
+          <span class="text-ochre">&bull;</span>
+          <span>Theme: Robotics, Automation &amp; Smart Manufacturing</span>
+        </div>
+
+        <h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-pine leading-[1.08]">
+          From the farmer's soil <br class="hidden sm:inline">
+          to the shopper's <span class="italic text-sage font-normal underline decoration-ochre decoration-wavy decoration-2">kitchen</span>.
+        </h1>
+
+        <p class="text-base sm:text-lg text-pine/80 font-normal leading-relaxed">
+          India loses <strong class="text-pine font-bold">35% of harvested vegetables</strong>—worth <strong class="text-ochre font-bold">₹2.1 Lakh Crore every year</strong>—because consumers cannot verify harvest freshness and farmers lack simple crate-tagging tools. We built a simple two-sided system that fixes this at the source.
+        </p>
+      </div>
+
+      <!-- 🚀 START OF PAGE: THE 2 BIG SIGN UP BUTTONS -->
+      <div class="space-y-3 pt-2">
+        <span class="font-mono text-xs uppercase font-bold text-ochre tracking-wider block">Get Started &bull; Choose Your Role:</span>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          
+          <!-- 1. Sign Up as Farmer Button Card -->
+          <a href="signup.html?role=farmer" class="p-6 rounded-2xl bg-[#f7f3ec] border-2 border-pine flex flex-col justify-between hover:bg-[#f2ece1] transition cursor-pointer group shadow-[4px_4px_0px_#10443e]">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-4xl">👨🏽‍🌾</span>
+                <span class="font-mono text-[10px] bg-white border border-pine px-2 py-0.5 rounded-full font-bold text-pine">START OF CHAIN</span>
+              </div>
+              <h2 class="font-display text-2xl font-bold text-pine group-hover:text-sage transition flex items-center justify-between">
+                <span>Sign Up as Farmer</span>
+                <span class="text-sage">&rarr;</span>
+              </h2>
+              <p class="text-xs text-pine/80 leading-relaxed">
+                Super simple harvest logger for farmers: log your crop, weight (KG), and location in 30 seconds to generate a ₹0.02 printable thermal QR crate tag.
+              </p>
+            </div>
+            
+            <div class="mt-5 pt-3 border-t border-pine/20 font-bold text-xs text-sage flex items-center justify-between">
+              <span>Go to Farmer Sign Up &rarr;</span>
+              <span class="font-mono text-[10px] bg-sage text-white px-2 py-0.5 rounded">Simple Entry</span>
+            </div>
+          </a>
+
+          <!-- 2. Sign Up as Shopper Button Card -->
+          <a href="signup.html?role=shopper" class="p-6 rounded-2xl bg-[#e6ede8] border-2 border-sage flex flex-col justify-between hover:bg-[#dce7e0] transition cursor-pointer group shadow-[4px_4px_0px_#10443e]">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-4xl">🛒</span>
+                <span class="font-mono text-[10px] bg-white border border-sage px-2 py-0.5 rounded-full font-bold text-sage">END OF CHAIN</span>
+              </div>
+              <h2 class="font-display text-2xl font-bold text-pine group-hover:text-sage transition flex items-center justify-between">
+                <span>Sign Up as Shopper</span>
+                <span class="text-sage">&rarr;</span>
+              </h2>
+              <p class="text-xs text-pine/80 leading-relaxed">
+                Smartphone camera scanner for consumers: scan any produce crate or packet to see true harvest time, transit temperature, and farmer earnings.
+              </p>
+            </div>
+            
+            <div class="mt-5 pt-3 border-t border-sage/30 font-bold text-xs text-sage flex items-center justify-between">
+              <span>Go to Shopper Sign Up &rarr;</span>
+              <span class="font-mono text-[10px] bg-pine text-white px-2 py-0.5 rounded">Live QR Scanner</span>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- Quick Demo Bypass Links -->
+        <div class="pt-2 flex flex-wrap items-center justify-between text-xs font-mono text-pine/70 gap-2">
+          <span>Want to explore the app directly?</span>
+          <div class="flex items-center gap-3">
+            <a href="farmer.html" class="font-bold text-sage hover:underline flex items-center gap-1">
+              <span>Launch Farmer App</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+            <span>&bull;</span>
+            <a href="shopper.html" class="font-bold text-sage hover:underline flex items-center gap-1">
+              <span>Launch Shopper Scanner</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 2. THE 4 COMPULSORY TRACKING STANDARDS                   -->
+    <!-- ======================================================== -->
+    <section id="standards" class="space-y-6">
+      
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b-2 border-pine pb-3">
+        <div>
+          <span class="font-mono text-xs font-bold text-ochre uppercase tracking-wider block">Standardized Core Architecture</span>
+          <h2 class="font-display text-3xl font-bold text-pine">
+            The 4 Compulsory Tracking Points
+          </h2>
+        </div>
+        <p class="text-xs font-mono text-pine/70 max-w-sm sm:text-right">
+          Mandatory data fields embedded on every thermal crate QR sticker and decoded on the consumer's phone.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        <!-- Pillar 1: Batch ID -->
+        <div class="hand-card p-6 bg-white space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-[#f2ece1] border-2 border-pine flex items-center justify-center font-mono font-black text-pine text-sm shadow-[2px_2px_0px_#10443e]">
+            01
+          </div>
+          <h3 class="font-display font-bold text-xl text-pine">Batch ID</h3>
+          <p class="text-xs text-pine/80 leading-relaxed">
+            Unique cryptographic identification code stamped at the farm gate so every vegetable crate can be traced individually through every transport leg.
+          </p>
+          <div class="p-2 rounded bg-[#f7f3ec] border border-pine/30 font-mono text-[11px] font-bold text-pine">
+            Example: <span class="text-sage">#TM-8402-NSK</span>
+          </div>
+        </div>
+
+        <!-- Pillar 2: Quantity -->
+        <div class="hand-card p-6 bg-white space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-[#f2ece1] border-2 border-pine flex items-center justify-center font-mono font-black text-pine text-sm shadow-[2px_2px_0px_#10443e]">
+            02
+          </div>
+          <h3 class="font-display font-bold text-xl text-pine">Quantity</h3>
+          <p class="text-xs text-pine/80 leading-relaxed">
+            Exact weight in kilograms (KG) and standardized crate count, auditing transit moisture evaporation and eliminating middleman pilferage.
+          </p>
+          <div class="p-2 rounded bg-[#f7f3ec] border border-pine/30 font-mono text-[11px] font-bold text-pine">
+            Example: <span class="text-sage">500.0 KG (25 Crates)</span>
+          </div>
+        </div>
+
+        <!-- Pillar 3: Harvested Place & Date -->
+        <div class="hand-card p-6 bg-white space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-[#f2ece1] border-2 border-pine flex items-center justify-center font-mono font-black text-pine text-sm shadow-[2px_2px_0px_#10443e]">
+            03
+          </div>
+          <h3 class="font-display font-bold text-xl text-pine">Harvest Place &amp; Date</h3>
+          <p class="text-xs text-pine/80 leading-relaxed">
+            True GPS farm village coordinates and verified harvest timestamp. Middlemen can never backdate or falsify old produce as "morning fresh".
+          </p>
+          <div class="p-2 rounded bg-[#f7f3ec] border border-pine/30 font-mono text-[11px] font-bold text-pine">
+            Example: <span class="text-sage">Dindori, Nashik &bull; 06:15 IST</span>
+          </div>
+        </div>
+
+        <!-- Pillar 4: Freshness Level -->
+        <div class="hand-card p-6 bg-white space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-[#f2ece1] border-2 border-pine flex items-center justify-center font-mono font-black text-pine text-sm shadow-[2px_2px_0px_#10443e]">
+            04
+          </div>
+          <h3 class="font-display font-bold text-xl text-pine">Freshness Level</h3>
+          <p class="text-xs text-pine/80 leading-relaxed">
+            Dynamic freshness percentage (%) and official grade (Grade A+), updated continuously by transit temperature logs and time elapsed.
+          </p>
+          <div class="p-2 rounded bg-[#f7f3ec] border border-pine/30 font-mono text-[11px] font-bold text-pine">
+            Example: <span class="text-sage">94% (Grade A+ Safe)</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 3. HOW IT WORKS: THE 3-STAGE FLOW                        -->
+    <!-- ======================================================== -->
+    <section id="how-it-works" class="hand-card p-8 sm:p-12 bg-white space-y-8">
+      
+      <div class="text-center max-w-2xl mx-auto space-y-2">
+        <span class="font-mono text-xs uppercase font-bold text-ochre">Physical Hardware Meets Lightweight Software</span>
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-pine">
+          How Farm to Table Tracked Works
+        </h2>
+        <p class="text-xs sm:text-sm text-pine/80">
+          A ₹0.02 paper tag at harvest eliminates thousands of crores in food spoilage down the road.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="p-6 rounded-2xl bg-[#f7f3ec] border-2 border-pine space-y-3">
+          <div class="text-3xl">1️⃣</div>
+          <h3 class="font-display font-bold text-lg text-pine">Farm Gate Crate Tagging</h3>
+          <p class="text-xs text-pine/80 leading-relaxed">
+            The farmer opens the <strong>Farmer App</strong> on any low-end smartphone, logs crop, quantity, and place, and prints a durable thermal QR sticker for ₹0.02.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-[#ede4d6] border-2 border-pine space-y-3">
+          <div class="text-3xl">2️⃣</div>
+          <h3 class="font-display font-bold text-lg text-pine">Cold-Chain Temperature Sync</h3>
+          <p class="text-xs text-pine/80 leading-relaxed">
+            During truck transit, reusable Bluetooth BLE sensor pucks log crate temperature every 15 minutes, guaranteeing perishable greens stay below 6°C.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-[#e6ede8] border-2 border-sage space-y-3">
+          <div class="text-3xl">3️⃣</div>
+          <h3 class="font-display font-bold text-lg text-pine">Shopper Camera Scan</h3>
+          <p class="text-xs text-pine/80 leading-relaxed">
+            The consumer opens the <strong>Shopper App</strong> at the mandi or supermarket, scans the crate QR, and sees the authentic <strong>Freshness Passport</strong>.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 4. STEP 1 Q2 RUPEE MATH CALCULATOR (₹2.1 LAKH CRORE)     -->
+    <!-- ======================================================== -->
+    <section id="calculator" class="hand-card p-6 sm:p-10 space-y-6 bg-white">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-pine pb-4">
+        <div>
+          <span class="font-mono text-xs text-ochre uppercase font-bold">HCL JIGSAW Step 1 &bull; Question 2 Working</span>
+          <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-pine">
+            ₹2.1 Lakh Crore Annual Spoilage Loss
+          </h2>
+          <p class="text-xs text-pine/80 mt-0.5">
+            Interactive mathematical verification of post-harvest losses across Indian horticulture.
+          </p>
+        </div>
+
+        <button id="calc-reset-btn" onclick="resetCalculator()" class="hand-btn-secondary px-3 py-1.5 text-xs font-mono font-bold self-start sm:self-auto">
+          Reset to Standard Values
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Left: Sliders -->
+        <div class="lg:col-span-6 space-y-5">
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs font-mono font-bold text-pine">
+              <span>Annual Vegetable Production:</span>
+              <span id="slider-tonnes-val" class="text-sage">200 Million Tonnes</span>
+            </div>
+            <input type="range" id="slider-tonnes" min="100" max="300" value="200" step="10" oninput="runCalculator()" class="w-full h-3">
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs font-mono font-bold text-pine">
+              <span>Post-Harvest Loss Rate:</span>
+              <span id="slider-loss-val" class="text-ochre">35%</span>
+            </div>
+            <input type="range" id="slider-loss" min="15" max="50" value="35" step="1" oninput="runCalculator()" class="w-full h-3">
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs font-mono font-bold text-pine">
+              <span>Average Farm-to-Retail Value:</span>
+              <span id="slider-price-val" class="text-pine">₹30 / kg</span>
+            </div>
+            <input type="range" id="slider-price" min="15" max="60" value="30" step="5" oninput="runCalculator()" class="w-full h-3">
+          </div>
+
+          <!-- Mathematical Working Box -->
+          <div class="rounded-xl bg-[#f2ece1] p-4 border border-pine text-xs font-mono space-y-1.5 text-pine">
+            <span class="font-bold text-sage block uppercase text-[11px]">Step-by-Step Mathematical Proof:</span>
+            <p class="text-[11px] leading-relaxed">
+              1. 200M tonnes &times; 35% loss = <strong class="text-pine">70 Million Tonnes Wasted</strong><br>
+              2. 70M tonnes &times; 1,000 kg/tonne = <strong class="text-pine">70 Billion Kilograms</strong><br>
+              3. 70 Billion kg &times; ₹30/kg = <strong class="text-ochre font-bold">₹2.1 Trillion = ₹2.1 Lakh Crore / Year</strong>
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Results Dashboard -->
+        <div class="lg:col-span-6 rounded-2xl bg-[#ede4d6] border-2 border-pine p-6 space-y-5">
+          <div>
+            <span class="text-xs font-mono text-pine/70 uppercase tracking-wider block mb-1 font-bold">Total National Economic Loss:</span>
+            <div class="flex items-baseline gap-2">
+              <span id="calc-result-rupees" class="font-display text-4xl sm:text-5xl font-black text-pine">
+                ₹2.10 Lakh Cr
+              </span>
+              <span class="text-xs font-mono font-bold text-pine/70">/ YEAR</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-3 border-t-2 border-pine/30 text-xs font-mono">
+            <div class="p-3 rounded-lg bg-white border border-pine">
+              <span class="text-[10px] text-pine/60 block">Tonnes Wasted:</span>
+              <span id="calc-result-tonnes" class="text-xl font-bold text-sage mt-1 block">70.0 Million</span>
+            </div>
+            <div class="p-3 rounded-lg bg-white border border-pine">
+              <span class="text-[10px] text-pine/60 block">Households Deprived:</span>
+              <span id="calc-result-households" class="text-xl font-bold text-ochre mt-1 block">96 Million</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-white border-2 border-sage text-xs font-mono space-y-1">
+            <div class="flex justify-between items-center">
+              <span class="text-sage font-bold">30% Waste Reduction via Our App:</span>
+              <span id="calc-savings-rupees" class="text-pine font-black text-sm">₹63,000 Cr / yr</span>
+            </div>
+            <span class="text-[10px] text-pine/70 block">Saves 21 Million Tonnes of fresh nutrition annually</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 5. COMPETITION RECORD & OFFICIAL PITCH                   -->
+    <!-- ======================================================== -->
+    <section id="pitch" class="hand-card p-8 sm:p-12 bg-[#f2ece1] text-center space-y-4 border-2 border-pine">
+      <span class="font-mono text-xs text-ochre uppercase font-bold tracking-wider">Official One-Sentence Pitch &bull; Step 5 &bull; Question 7</span>
+      <blockquote class="font-display text-2xl sm:text-3xl font-extrabold text-pine max-w-4xl mx-auto leading-relaxed">
+        &ldquo;Our automated tracking system monitors food shipments from farms to consumer tables, helping farmers, retailers, and shoppers reduce spoilage, improve transparency, and build consumer trust in fresh logistics.&rdquo;
+      </blockquote>
+      <div class="pt-2 text-xs font-mono text-pine/70">
+        HCL JIGSAW Edition 7 &bull; Grade 9 Smart Manufacturing &bull; Team AgriOS
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 6. END OF PAGE: BIG SIGN UP BANNER (END: 2 BUTTONS)      -->
+    <!-- ======================================================== -->
+    <section class="hand-card p-8 sm:p-12 bg-[#ede4d6] border-2 border-pine text-center space-y-6">
+      <div class="space-y-2">
+        <span class="font-mono text-xs uppercase font-bold text-ochre tracking-wider block">Ready to Experience the Solution?</span>
+        <h2 class="font-display text-3xl sm:text-5xl font-extrabold text-pine">
+          Join Farm to Table Tracked Today
+        </h2>
+        <p class="text-xs sm:text-sm text-pine/80 max-w-xl mx-auto">
+          Create an account to start logging crate tags as a farmer or inspect produce freshness with your phone camera as a shopper.
+        </p>
+      </div>
+
+      <!-- 🚀 END OF PAGE: THE 2 BIG SIGN UP BUTTONS -->
+      <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+        <a href="signup.html?role=farmer" class="hand-btn-primary py-4 px-8 text-base flex items-center gap-2.5 font-bold shadow-[4px_4px_0px_#10443e]">
+          <span>👨🏽‍🌾 Sign Up as Farmer</span>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
+        <a href="signup.html?role=shopper" class="hand-btn-secondary py-4 px-8 text-base flex items-center gap-2.5 font-bold shadow-[4px_4px_0px_#10443e]">
+          <span>🛒 Sign Up as Shopper</span>
+          <i data-lucide="scan" class="w-5 h-5 text-sage"></i>
+        </a>
+      </div>
+
+      <div class="text-xs font-mono text-pine/70 pt-2">
+        Direct App Access: <a href="farmer.html" class="underline font-bold text-sage">Farmer Workstation</a> &bull; <a href="shopper.html" class="underline font-bold text-sage">Shopper Scanner</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t-2 border-pine bg-[#f2ece1] py-8 text-pine/80 text-xs font-mono mt-auto">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-sage"></span>
+        <span class="text-pine font-bold">Farm to Table Tracked &bull; Landing Page</span>
+      </div>
+      <div class="text-pine/70 font-bold">
+        <span>The 4 Pillars: Batch ID &bull; Quantity &bull; Place &amp; Date &bull; Freshness Level</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Calculator Script -->
+  <script>
+    function runCalculator() {
+      const sliderTonnes = document.getElementById('slider-tonnes');
+      const sliderLoss = document.getElementById('slider-loss');
+      const sliderPrice = document.getElementById('slider-price');
+
+      if (!sliderTonnes || !sliderLoss || !sliderPrice) return;
+      const annualTonnes = parseFloat(sliderTonnes.value);
+      const lossPercent = parseFloat(sliderLoss.value);
+      const priceKg = parseFloat(sliderPrice.value);
+
+      const wastedTonnes = annualTonnes * (lossPercent / 100);
+      const wastedKg = wastedTonnes * 1000000 * 1000;
+      const wastedRupees = wastedKg * priceKg;
+      const lakhCrores = wastedRupees / 1000000000000;
+
+      const householdsFed = Math.round((wastedKg / 720) / 1000000);
+      const savingsCrores = (wastedRupees * 0.30) / 10000000;
+
+      document.getElementById('slider-tonnes-val').textContent = `${annualTonnes} Million Tonnes`;
+      document.getElementById('slider-loss-val').textContent = `${lossPercent}%`;
+      document.getElementById('slider-price-val').textContent = `₹${priceKg} / kg`;
+
+      document.getElementById('calc-result-rupees').textContent = `₹${lakhCrores.toFixed(2)} Lakh Cr`;
+      document.getElementById('calc-result-tonnes').textContent = `${wastedTonnes.toFixed(1)} Million`;
+      document.getElementById('calc-result-households').textContent = `${householdsFed} Million`;
+      document.getElementById('calc-savings-rupees').textContent = `₹${Math.round(savingsCrores).toLocaleString('en-IN')} Cr / yr`;
+    }
+
+    function resetCalculator() {
+      document.getElementById('slider-tonnes').value = 200;
+      document.getElementById('slider-loss').value = 35;
+      document.getElementById('slider-price').value = 30;
+      runCalculator();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      runCalculator();
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

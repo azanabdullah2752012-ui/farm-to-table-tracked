@@ -1,0 +1,21 @@
+{
+  "name": "farm-to-table-tracked",
+  "version": "1.0.0",
+  "description": "Farm to Table Tracked - HCL JIGSAW Edition 7 Grade 9 Robotics & Smart Manufacturing Web App",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx serve -l 3000 .",
+    "dev": "npx serve -l 3000 .",
+    "build": "node -e \"console.log('Validating site assets...'); const fs=require('fs'); ['index.html','signup.html','farmer.html','shopper.html','app.js','styles.css'].forEach(f=>{if(!fs.existsSync(f)) throw new Error('Missing '+f); console.log('✓ ' + f + ' validated (' + fs.statSync(f).size + ' bytes)');}); console.log('Build validation passed cleanly with 0 errors.');\"",
+    "test": "npm run build"
+  },
+  "keywords": [
+    "hcl-jigsaw",
+    "smart-manufacturing",
+    "agritech",
+    "qr-traceability",
+    "food-waste"
+  ],
+  "author": "Grade 9 Robotics Team",
+  "license": "MIT"
+}

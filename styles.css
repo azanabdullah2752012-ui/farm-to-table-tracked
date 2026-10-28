@@ -1,0 +1,190 @@
+/* Hand-drawn Friendly & Tactile Editorial Stylesheet */
+/* Colors: #10443e (Pine), #32745c (Sage), #62a29a (Seafoam), #b29361 (Ochre), #ede4d6 (Linen) */
+
+:root {
+  --pine: #10443e;
+  --sage: #32745c;
+  --seafoam: #62a29a;
+  --ochre: #b29361;
+  --linen: #ede4d6;
+  --paper: #fbf9f4;
+  --paper-card: #ffffff;
+}
+
+body {
+  background-color: var(--linen);
+  color: var(--pine);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background-image: 
+    radial-gradient(#10443e 0.6px, transparent 0.6px), 
+    radial-gradient(#10443e 0.6px, #ede4d6 0.6px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Editorial Serif & Doodle Fonts */
+.font-display {
+  font-family: 'Fraunces', serif;
+}
+.font-doodle {
+  font-family: 'Gaegu', cursive, sans-serif;
+}
+.font-mono-data {
+  font-family: 'Space Mono', monospace;
+}
+
+/* Hand-Drawn Tactile Cards */
+.hand-card {
+  background: var(--paper-card);
+  border: 2px solid var(--pine);
+  border-radius: 20px;
+  box-shadow: 4px 4px 0px var(--pine);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hand-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px var(--pine);
+}
+
+.hand-btn-primary {
+  background-color: var(--pine);
+  color: #ffffff;
+  border: 2px solid var(--pine);
+  border-radius: 14px;
+  box-shadow: 3px 3px 0px var(--ochre);
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+.hand-btn-primary:hover {
+  background-color: var(--sage);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px var(--pine);
+}
+.hand-btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--pine);
+}
+
+.hand-btn-secondary {
+  background-color: #ffffff;
+  color: var(--pine);
+  border: 2px solid var(--pine);
+  border-radius: 14px;
+  box-shadow: 3px 3px 0px var(--pine);
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+.hand-btn-secondary:hover {
+  background-color: #f7f3ec;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px var(--ochre);
+}
+.hand-btn-secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--pine);
+}
+
+/* App Tab Buttons in Nav */
+.app-tab-btn {
+  padding: 0.5rem 0.95rem;
+  border-radius: 9999px;
+  border: 2px solid var(--pine);
+  background: #ffffff;
+  color: var(--pine);
+  font-weight: 700;
+  font-size: 0.8rem;
+  box-shadow: 2px 2px 0px var(--pine);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.app-tab-btn:hover {
+  background: var(--seafoam);
+  color: #ffffff;
+}
+.app-tab-btn.active-app-tab {
+  background: var(--pine);
+  color: #ffffff;
+  box-shadow: 3px 3px 0px var(--ochre);
+}
+
+/* Laser Scanner Animation */
+.scan-laser-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #32745c, transparent);
+  box-shadow: 0 0 10px 2px rgba(50, 116, 92, 0.7);
+  animation: laserScan 2.2s ease-in-out infinite alternate;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes laserScan {
+  0% { top: 6%; opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { top: 92%; opacity: 0.3; }
+}
+
+/* Range input styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e2d7c5;
+  border-radius: 9999px;
+  border: 1.5px solid var(--pine);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ochre);
+  cursor: pointer;
+  border: 2px solid var(--pine);
+  box-shadow: 2px 2px 0px var(--pine);
+  transition: transform 0.1s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: var(--sage);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #ede4d6;
+}
+::-webkit-scrollbar-thumb {
+  background: #b29361;
+  border-radius: 4px;
+  border: 2px solid #ede4d6;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #10443e;
+}
+
+/* Thermal Sticker Print Styles */
+@media print {
+  header, nav, footer, .app-tab-btn, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+    background-image: none !important;
+  }
+  #printable-label {
+    box-shadow: none !important;
+    border: 2px solid black !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 20px auto !important;
+  }
+}

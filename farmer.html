@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer App · Farm to Table Tracked</title>
+  <meta name="description" content="Simple harvest logging and instant crate QR tag printing for farmers.">
+
+  <!-- Google Fonts: Fraunces, Gaegu, Plus Jakarta Sans, Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Gaegu:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pine: '#10443e',
+            sage: '#32745c',
+            seafoam: '#62a29a',
+            ochre: '#b29361',
+            linen: '#ede4d6',
+            paper: '#fbf9f4',
+            paperDark: '#f2ece1'
+          },
+          fontFamily: {
+            display: ['"Fraunces"', 'serif'],
+            doodle: ['"Gaegu"', 'cursive', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"Space Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Local Standalone Scripts -->
+  <script src="lucide.min.js"></script>
+  <script src="qrcode.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-full flex flex-col font-sans antialiased text-pine selection:bg-seafoam selection:text-white">
+
+  <!-- TOP APP BAR -->
+  <header class="border-b-2 border-pine bg-[#f9f6f0] px-4 sm:px-6 lg:px-8 py-3 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <!-- Logo & Role Badge -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="w-10 h-10 rounded-xl bg-pine text-linen flex items-center justify-center border-2 border-pine shadow-[3px_3px_0px_#b29361] hover:scale-105 transition">
+          <i data-lucide="sprout" class="w-5 h-5"></i>
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display text-xl font-bold tracking-tight text-pine">Farm to Table</span>
+            <span class="font-doodle text-sm text-sage font-bold bg-[#ede4d6] px-2 py-0.5 rounded-full border border-pine">Farmer Workstation</span>
+          </div>
+          <div class="flex items-center gap-2 text-[11px] font-mono text-pine/80">
+            <span id="user-display-name" class="font-bold text-sage">👨🏽‍🌾 Ramesh Patil</span>
+            <span>&bull;</span>
+            <span id="user-display-place">Dindori, Nashik</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Nav -->
+      <div class="flex items-center gap-2 text-xs">
+        <a href="shopper.html" class="hand-btn-secondary px-3 py-1.5 flex items-center gap-1.5 font-bold">
+          <span>🛒 Open Shopper App</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-sage"></i>
+        </a>
+        <a href="index.html" class="hand-btn-secondary px-3 py-1.5 flex items-center gap-1.5 font-bold text-pine/70 hover:text-pine">
+          <i data-lucide="home" class="w-3.5 h-3.5"></i>
+          <span>Landing Page</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN FARMER APP CONTAINER -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+    <!-- Header Description -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-pine pb-4">
+      <div>
+        <div class="font-doodle text-lg text-sage font-bold">START OF SUPPLY CHAIN · ZERO COMPLEXITY</div>
+        <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-pine">
+          Log Harvest &amp; Print QR Crate Sticker
+        </h1>
+        <p class="text-xs sm:text-sm text-pine/80 mt-1">
+          Designed for quick farm gate entry: enter 4 simple values below, stick the ₹0.02 thermal QR label onto your crate, and send to the mandi.
+        </p>
+      </div>
+
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border-2 border-pine shadow-[2px_2px_0px_#10443e] text-xs font-mono font-bold text-pine self-start sm:self-auto">
+        <span class="w-2.5 h-2.5 rounded-full bg-sage animate-ping"></span>
+        <span>Mandi Sync: CONNECTED</span>
+      </div>
+    </div>
+
+    <!-- 2-Column Workstation: Input Form (Left) & Thermal Label (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left Column: The Super Simple Farmer Input Form -->
+      <div class="lg:col-span-7 hand-card p-6 sm:p-8 bg-white space-y-5">
+        <div class="flex items-center justify-between border-b border-pine/20 pb-3">
+          <span class="font-display font-bold text-pine text-base flex items-center gap-2">
+            <i data-lucide="clipboard-pen" class="w-5 h-5 text-sage"></i>
+            Farm Harvest Entry Details
+          </span>
+          <span class="font-mono text-xs bg-[#ede4d6] border border-pine px-2 py-0.5 rounded-full font-bold text-pine">
+            SIMPLE FORM
+          </span>
+        </div>
+
+        <form id="farmer-harvest-form" class="space-y-4" onsubmit="event.preventDefault(); handleFarmerFormSubmit();">
+          
+          <!-- 1. Vegetable Harvested -->
+          <div class="space-y-1">
+            <label class="text-xs font-mono font-bold text-pine block">
+              1. What vegetable did you harvest? *
+            </label>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1 pb-2">
+              <button type="button" onclick="selectCropPreset('Vine Tomatoes', '🍅')" class="crop-preset-btn p-2 rounded-xl border border-pine bg-[#f7f3ec] hover:bg-[#ede4d6] text-center transition">
+                <span class="text-2xl block">🍅</span>
+                <span class="text-[10px] font-bold block truncate">Tomatoes</span>
+              </button>
+              <button type="button" onclick="selectCropPreset('Baby Spinach', '🥬')" class="crop-preset-btn p-2 rounded-xl border border-pine bg-[#f7f3ec] hover:bg-[#ede4d6] text-center transition">
+                <span class="text-2xl block">🥬</span>
+                <span class="text-[10px] font-bold block truncate">Spinach</span>
+              </button>
+              <button type="button" onclick="selectCropPreset('Bell Peppers', '🫑')" class="crop-preset-btn p-2 rounded-xl border border-pine bg-[#f7f3ec] hover:bg-[#ede4d6] text-center transition">
+                <span class="text-2xl block">🫑</span>
+                <span class="text-[10px] font-bold block truncate">Peppers</span>
+              </button>
+              <button type="button" onclick="selectCropPreset('Red Onions', '🧅')" class="crop-preset-btn p-2 rounded-xl border border-pine bg-[#f7f3ec] hover:bg-[#ede4d6] text-center transition">
+                <span class="text-2xl block">🧅</span>
+                <span class="text-[10px] font-bold block truncate">Onions</span>
+              </button>
+              <button type="button" onclick="selectCropPreset('Farm Potatoes', '🥔')" class="crop-preset-btn p-2 rounded-xl border border-pine bg-[#f7f3ec] hover:bg-[#ede4d6] text-center transition">
+                <span class="text-2xl block">🥔</span>
+                <span class="text-[10px] font-bold block truncate">Potatoes</span>
+              </button>
+              <button type="button" onclick="selectCropPreset('Carrots', '🥕')" class="crop-preset-btn p-2 rounded-xl border border-pine bg-[#f7f3ec] hover:bg-[#ede4d6] text-center transition">
+                <span class="text-2xl block">🥕</span>
+                <span class="text-[10px] font-bold block truncate">Carrots</span>
+              </button>
+            </div>
+            <input type="text" id="farmer-crop" required value="Vine Tomatoes" placeholder="Crop Name" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-sm font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+          </div>
+
+          <!-- 2. Quantity (KG) -->
+          <div class="space-y-1">
+            <label class="text-xs font-mono font-bold text-pine flex items-center justify-between">
+              <span>2. How many kilograms (KG)? *</span>
+              <span id="crates-calc-preview" class="text-[10px] text-sage font-bold">25 Crates (~20kg / crate)</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="farmer-qty" required min="5" max="10000" step="5" value="500" oninput="updateCratesNote()" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3.5 py-2.5 text-sm font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+              <span class="font-mono font-bold text-xs text-pine bg-[#ede4d6] border-2 border-pine px-4 py-2.5 rounded-xl shrink-0">KG</span>
+            </div>
+          </div>
+
+          <!-- 3. Harvest Place & Date -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <label class="text-xs font-mono font-bold text-pine block">
+                3a. Farm Location (Place): *
+              </label>
+              <input type="text" id="farmer-place" required value="Dindori Taluka, Nashik, Maharashtra" placeholder="Village, District" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3 py-2 text-xs font-mono text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-xs font-mono font-bold text-pine block">
+                3b. Harvest Date &amp; Time: *
+              </label>
+              <input type="datetime-local" id="farmer-date" required class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3 py-2 text-xs font-mono text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+            </div>
+          </div>
+
+          <!-- 4. Batch ID (Auto or Custom) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <label class="text-xs font-mono font-bold text-pine flex items-center justify-between">
+                <span>4. Batch ID: *</span>
+                <button type="button" onclick="autoGenerateBatchCode()" class="text-sage text-[10px] underline font-bold">Auto-Generate</button>
+              </label>
+              <input type="text" id="farmer-batch-id" required value="TM-8402-NSK" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3 py-2 text-xs font-mono font-bold text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-xs font-mono font-bold text-pine block">
+                Farmer Name: *
+              </label>
+              <input type="text" id="farmer-name" required value="Ramesh Patil" placeholder="Farmer Name" class="w-full bg-[#fbf9f4] border-2 border-pine rounded-xl px-3 py-2 text-xs font-mono text-pine focus:outline-none focus:border-sage shadow-[2px_2px_0px_#10443e]">
+            </div>
+          </div>
+
+          <!-- Big Submit Button -->
+          <button type="submit" id="btn-submit-tag" class="w-full py-4 px-6 hand-btn-primary text-base flex items-center justify-center gap-2 font-bold mt-2 shadow-[4px_4px_0px_#b29361]">
+            <i data-lucide="printer" class="w-5 h-5"></i>
+            <span>Generate &amp; Print Crate QR Sticker</span>
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Right Column: The Physical Thermal Crate Tag Preview -->
+      <div class="lg:col-span-5 space-y-4">
+        
+        <div class="flex items-center justify-between text-xs font-mono font-bold text-pine">
+          <span>Live Crate Tag (₹0.02 Thermal Print):</span>
+          <span class="text-sage">&check; Ready to Stick on Crate</span>
+        </div>
+
+        <div id="printable-label" class="hand-card p-6 bg-white space-y-4 border-2 border-pine shadow-md">
+          <div class="border-b-2 border-pine pb-2 flex items-center justify-between">
+            <div>
+              <span class="font-mono text-[9px] uppercase font-bold bg-pine text-white px-2 py-0.5 rounded">
+                FARM-TO-TABLE CRATE TAG
+              </span>
+              <h3 id="label-crop-title" class="font-display text-lg font-bold text-pine mt-1">Vine Tomatoes</h3>
+            </div>
+            <span id="label-badge-symbol" class="text-3xl">🍅</span>
+          </div>
+
+          <!-- The 4 Compulsory Tracking Points on the Sticker -->
+          <div class="flex items-center gap-4 py-1">
+            <div id="qrcode-container" class="w-28 h-28 bg-white p-1 border-2 border-pine rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+              <!-- Dynamically generated QR -->
+            </div>
+            
+            <div class="space-y-1.5 font-mono text-xs leading-tight text-pine">
+              <div>
+                <span class="text-pine/60 block text-[9px] uppercase font-bold">1. Batch ID:</span>
+                <strong id="label-batch-id" class="text-sm font-black text-pine">#TM-8402-NSK</strong>
+              </div>
+              <div>
+                <span class="text-pine/60 block text-[9px] uppercase font-bold">2. Quantity:</span>
+                <strong id="label-quantity" class="text-xs font-bold text-sage">500.0 KG (25 Crates)</strong>
+              </div>
+              <div>
+                <span class="text-pine/60 block text-[9px] uppercase font-bold">3. Harvest Place &amp; Date:</span>
+                <span id="label-place-date" class="font-bold text-[11px] block">Dindori, Nashik &bull; Today</span>
+              </div>
+              <div>
+                <span class="text-pine/60 block text-[9px] uppercase font-bold">4. Freshness Level:</span>
+                <span id="label-freshness" class="font-bold text-xs text-sage">98% (Grade A+)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[9px] font-mono text-center text-pine/70 border-t border-pine/20 pt-1">
+            SCAN WITH SHOPPER APP TO VIEW HONEST FRESHNESS PASSPORT
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="window.print()" class="hand-btn-secondary py-3 text-xs flex items-center justify-center gap-1.5 font-bold">
+            <i data-lucide="printer" class="w-4 h-4 text-sage"></i>
+            <span>Print Sticker</span>
+          </button>
+          
+          <button onclick="goToShopperWithCurrentBatch()" class="hand-btn-primary py-3 text-xs flex items-center justify-center gap-1.5 font-bold shadow-[2px_2px_0px_#10443e]">
+            <i data-lucide="scan" class="w-4 h-4"></i>
+            <span>Test in Shopper App &rarr;</span>
+          </button>
+        </div>
+
+        <!-- Farmer Help Callout -->
+        <div class="p-4 rounded-xl bg-[#ede4d6] border border-pine text-xs text-pine/80 space-y-1">
+          <div class="font-bold text-pine flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-4 h-4 text-sage"></i>
+            <span>Fair Minimum Price Guarantee:</span>
+          </div>
+          <p class="text-[11px] leading-relaxed">
+            Every scanned batch locks in direct farm-gate pricing (e.g. ₹24.50/kg for Grade A+), bypassing middlemen margin deductions.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RECENT HARVEST BATCHES TABLE -->
+    <div class="hand-card p-6 sm:p-8 bg-white space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-pine/20 pb-3">
+        <div>
+          <h2 class="font-display text-xl font-bold text-pine">
+            Your Active Farm Batches
+          </h2>
+          <span class="text-xs text-pine/70 font-mono">Stamped with the 4 compulsory tracking points</span>
+        </div>
+        <span class="font-mono text-xs bg-[#f2ece1] border border-pine px-3 py-1 rounded-full text-pine font-bold">
+          3 Batches Active
+        </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono">
+          <thead class="border-b-2 border-pine text-pine bg-[#f7f3ec]">
+            <tr>
+              <th class="p-3">1. Batch ID</th>
+              <th class="p-3">Crop</th>
+              <th class="p-3">2. Quantity</th>
+              <th class="p-3">3. Harvest Place &amp; Date</th>
+              <th class="p-3">4. Freshness Level</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="farmer-batches-table-body" class="divide-y divide-pine/10">
+            <!-- Populated via script -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Sound & Logic -->
+  <script>
+    // Audio engine
+    function playAudio(freq = 440, type = 'sine', duration = 0.08) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Default Initial Batches
+    let batches = [
+      {
+        id: "TM-8402-NSK",
+        crop: "Vine Tomatoes",
+        symbol: "🍅",
+        quantityKg: 500.0,
+        crates: 25,
+        harvestPlace: "Dindori Taluka, Nashik, Maharashtra",
+        harvestDate: new Date(Date.now() - 38.5 * 3600 * 1000),
+        freshnessPct: 94,
+        grade: "A+",
+        farmerName: "Ramesh Patil",
+        farmerPrice: 24.50
+      },
+      {
+        id: "SP-1094-OTY",
+        crop: "Mountain Baby Spinach",
+        symbol: "🥬",
+        quantityKg: 200.0,
+        crates: 20,
+        harvestPlace: "Ketti Valley, Nilgiris, Tamil Nadu",
+        harvestDate: new Date(Date.now() - 53.0 * 3600 * 1000),
+        freshnessPct: 78,
+        grade: "A",
+        farmerName: "K. Sundaram",
+        farmerPrice: 38.00
+      },
+      {
+        id: "BP-5531-SML",
+        crop: "Crisp Bell Peppers",
+        symbol: "🫑",
+        quantityKg: 350.0,
+        crates: 23,
+        harvestPlace: "Theog, Shimla, Himachal Pradesh",
+        harvestDate: new Date(Date.now() - 14.0 * 3600 * 1000),
+        freshnessPct: 91,
+        grade: "A+",
+        farmerName: "Vikram Thakur",
+        farmerPrice: 45.00
+      }
+    ];
+
+    let currentBatch = batches[0];
+
+    // Load user session from localStorage
+    function loadUserSession() {
+      const stored = localStorage.getItem('ftt_current_user');
+      if (stored) {
+        try {
+          const u = JSON.parse(stored);
+          if (u.name) {
+            document.getElementById('user-display-name').textContent = `👨🏽‍🌾 ${u.name}`;
+            document.getElementById('farmer-name').value = u.name;
+          }
+          if (u.place) {
+            document.getElementById('user-display-place').textContent = u.place.split(',')[0];
+            document.getElementById('farmer-place').value = u.place;
+          }
+          if (u.crop) {
+            document.getElementById('farmer-crop').value = u.crop;
+          }
+        } catch (e) {}
+      }
+    }
+
+    // QR Code Render Helper
+    function renderQR(container, text) {
+      if (!container) return;
+      container.innerHTML = '';
+      try {
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(container, {
+            text: text,
+            width: 104,
+            height: 104,
+            colorDark: "#10443e",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          return;
+        }
+      } catch (e) {}
+      // Fallback SVG
+      container.innerHTML = `<svg viewBox="0 0 100 100" class="w-full h-full"><rect width="100" height="100" fill="white"/><rect x="10" y="10" width="30" height="30" fill="#10443e"/><rect x="60" y="10" width="30" height="30" fill="#10443e"/><rect x="10" y="60" width="30" height="30" fill="#10443e"/></svg>`;
+    }
+
+    function renderLabel(b) {
+      document.getElementById('label-crop-title').textContent = b.crop;
+      document.getElementById('label-badge-symbol').textContent = b.symbol;
+      document.getElementById('label-batch-id').textContent = `#${b.id}`;
+      document.getElementById('label-quantity').textContent = `${b.quantityKg.toFixed(1)} KG (${b.crates} Crates)`;
+      
+      const dateStr = b.harvestDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      const placeShort = b.harvestPlace.split(',')[0].trim();
+      document.getElementById('label-place-date').textContent = `${placeShort} • ${dateStr}`;
+      document.getElementById('label-freshness').textContent = `${b.freshnessPct}% (Grade ${b.grade})`;
+
+      const qrPayload = JSON.stringify({
+        batch_id: b.id,
+        crop: b.crop,
+        quantity_kg: b.quantityKg,
+        harvest_place: b.harvestPlace,
+        harvest_date: b.harvestDate.toISOString(),
+        freshness: `${b.freshnessPct}%`
+      });
+
+      renderQR(document.getElementById('qrcode-container'), qrPayload);
+    }
+
+    function updateCratesNote() {
+      const qty = parseFloat(document.getElementById('farmer-qty').value) || 0;
+      const crates = Math.ceil(qty / 20);
+      document.getElementById('crates-calc-preview').textContent = `${crates} Crates (~20kg / crate)`;
+    }
+
+    function selectCropPreset(name, sym) {
+      playAudio(520, 'sine', 0.04);
+      document.getElementById('farmer-crop').value = name;
+      autoGenerateBatchCode();
+    }
+
+    function autoGenerateBatchCode() {
+      playAudio(560, 'sine', 0.04);
+      const crop = document.getElementById('farmer-crop').value.trim() || "VG";
+      const prefix = crop.substring(0, 2).toUpperCase();
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('farmer-batch-id').value = `${prefix}-${rand}-NSK`;
+    }
+
+    function handleFarmerFormSubmit() {
+      playAudio(650, 'square', 0.08);
+      const crop = document.getElementById('farmer-crop').value.trim();
+      const qty = parseFloat(document.getElementById('farmer-qty').value);
+      const place = document.getElementById('farmer-place').value.trim();
+      const dateVal = document.getElementById('farmer-date').value;
+      const batchId = document.getElementById('farmer-batch-id').value.trim();
+      const farmerName = document.getElementById('farmer-name').value.trim();
+
+      const harvestDate = dateVal ? new Date(dateVal) : new Date();
+      const crates = Math.ceil(qty / 20);
+
+      let symbol = "🌱";
+      const c = crop.toLowerCase();
+      if (c.includes('tomato')) symbol = "🍅";
+      else if (c.includes('spinach') || c.includes('palak')) symbol = "🥬";
+      else if (c.includes('pepper') || c.includes('capsicum')) symbol = "🫑";
+      else if (c.includes('onion')) symbol = "🧅";
+      else if (c.includes('potato')) symbol = "🥔";
+      else if (c.includes('carrot')) symbol = "🥕";
+
+      const newBatch = {
+        id: batchId,
+        crop: crop,
+        symbol: symbol,
+        quantityKg: qty,
+        crates: crates,
+        harvestPlace: place,
+        harvestDate: harvestDate,
+        freshnessPct: 98,
+        grade: "A+",
+        farmerName: farmerName,
+        farmerPrice: 24.50
+      };
+
+      batches.unshift(newBatch);
+      currentBatch = newBatch;
+
+      // Save shared batches to localStorage so Shopper app sees them!
+      localStorage.setItem('ftt_shared_batches', JSON.stringify(batches));
+
+      renderLabel(newBatch);
+      renderBatchesTable();
+
+      const btn = document.getElementById('btn-submit-tag');
+      btn.innerHTML = `<i data-lucide="check" class="w-5 h-5"></i> <span>Tag Generated &amp; Synced!</span>`;
+      if (window.lucide) lucide.createIcons();
+      setTimeout(() => {
+        btn.innerHTML = `<i data-lucide="printer" class="w-5 h-5"></i> <span>Generate &amp; Print Crate QR Sticker</span>`;
+        if (window.lucide) lucide.createIcons();
+      }, 1800);
+    }
+
+    function renderBatchesTable() {
+      const tbody = document.getElementById('farmer-batches-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      batches.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-[#fbf9f4] transition";
+        const dateStr = b.harvestDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        const placeShort = b.harvestPlace.split(',')[0].trim();
+
+        tr.innerHTML = `
+          <td class="p-3 font-bold text-pine">#${b.id}</td>
+          <td class="p-3 font-bold">${b.symbol} ${b.crop}</td>
+          <td class="p-3 text-sage font-bold">${b.quantityKg} KG</td>
+          <td class="p-3 text-pine/80">${placeShort} &bull; ${dateStr}</td>
+          <td class="p-3 font-bold text-sage">${b.freshnessPct}% (${b.grade})</td>
+          <td class="p-3 text-right space-x-2">
+            <button onclick="previewBatch('${b.id}')" class="px-2 py-1 rounded bg-[#ede4d6] border border-pine text-[10px] font-bold hover:bg-pine hover:text-white transition">Tag</button>
+            <a href="shopper.html?batch=${b.id}" class="px-2 py-1 rounded bg-pine text-white border border-pine text-[10px] font-bold hover:bg-sage transition">Inspect</a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function previewBatch(id) {
+      const b = batches.find(x => x.id === id);
+      if (b) {
+        currentBatch = b;
+        renderLabel(b);
+        playAudio(520, 'sine', 0.05);
+      }
+    }
+
+    function goToShopperWithCurrentBatch() {
+      playAudio(784, 'triangle', 0.1);
+      // Save shared batches
+      localStorage.setItem('ftt_shared_batches', JSON.stringify(batches));
+      window.location.href = `shopper.html?batch=${currentBatch.id}`;
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      // Restore cached batches if present
+      const saved = localStorage.getItem('ftt_shared_batches');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length) {
+            batches = parsed;
+            batches.forEach(b => b.harvestDate = new Date(b.harvestDate));
+            currentBatch = batches[0];
+          }
+        } catch (e) {}
+      }
+
+      // Set datetime default
+      const dtInput = document.getElementById('farmer-date');
+      if (dtInput) {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        dtInput.value = now.toISOString().slice(0, 16);
+      }
+
+      loadUserSession();
+      renderLabel(currentBatch);
+      renderBatchesTable();
+      updateCratesNote();
+
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
