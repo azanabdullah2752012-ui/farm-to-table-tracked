@@ -1,7 +1,7 @@
 {
-  "name": "farm-to-table-tracked",
+  "name": "greenminds",
   "version": "1.0.0",
-  "description": "Farm to Table Tracked - HCL JIGSAW Edition 7 Grade 9 Robotics & Smart Manufacturing Web App",
+  "description": "GreenMinds - HCL JIGSAW Edition 7 Grade 9 Robotics & Smart Manufacturing Web App",
   "main": "app.js",
   "scripts": {
     "start": "npx serve -l 3000 .",

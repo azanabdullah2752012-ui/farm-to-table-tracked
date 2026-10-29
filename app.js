@@ -1,5 +1,5 @@
 /**
- * Farm to Table Tracked · Focused App Engine
+ * GreenMinds · Focused App Engine
  * Connects the Farmer App (simple entry) to the Shopper App (freshness scan)
  * Tracking the 4 Compulsory Pillars: Batch ID, Quantity, Harvested Place & Date, Freshness Level
  */

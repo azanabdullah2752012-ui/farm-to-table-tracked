@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farm to Table Tracked · Produce Scanner</title>
-  <meta name="description" content="Scan vegetable crate QR code to inspect honest harvest passport.">
+  <title>GreenMinds · QR Scanner</title>
+  <meta name="description" content="GreenMinds — scan a QR code to visit the site or inspect a harvest passport.">
 
   <!-- Google Fonts: Fraunces, Plus Jakarta Sans, Space Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +36,7 @@
   </script>
 
   <script src="lucide.min.js"></script>
+  <script src="jsqr.min.js"></script>
   <link rel="stylesheet" href="styles.css">
   <style>
     body {
@@ -104,60 +105,70 @@
     <div class="space-y-2">
       <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f2ece1] border border-pine text-xs font-mono font-bold text-pine">
         <span class="w-2 h-2 rounded-full bg-sage animate-ping"></span>
-        <span>Farm to Table Tracked</span>
+        <span>GreenMinds</span>
       </div>
       
       <h1 class="font-display text-3xl font-extrabold text-pine">
-        Produce QR Scanner
+        QR Code Scanner
       </h1>
       
       <p class="text-xs text-pine/75 max-w-xs mx-auto">
-        Scan the QR sticker on any vegetable crate to inspect the verified harvest passport.
+        Point your camera at a GreenMinds QR code to be redirected instantly, or scan a crate tag to inspect the harvest passport.
       </p>
     </div>
 
-    <!-- Scanner Viewfinder Box with Fake Crate Tag -->
-    <div class="relative w-full aspect-square max-w-[280px] mx-auto rounded-3xl bg-[#fbf9f4] border-2 border-dashed border-pine p-5 flex flex-col items-center justify-center overflow-hidden shadow-inner cursor-pointer group" onclick="triggerFakeScan()">
+    <!-- Live Camera Scanner Viewfinder -->
+    <div class="relative w-full aspect-square max-w-[280px] mx-auto rounded-3xl bg-[#0a0f0d] border-2 border-pine overflow-hidden shadow-inner">
       
-      <!-- Scanning laser (active while scanning) -->
-      <div id="laser-line" class="scanner-laser hidden"></div>
+      <!-- Video feed -->
+      <video id="qr-video" playsinline class="absolute inset-0 w-full h-full object-cover"></video>
+      <!-- Hidden canvas for jsQR processing -->
+      <canvas id="qr-canvas" class="hidden"></canvas>
 
-      <!-- Fake QR Code Target (Clickable) -->
-      <div id="qr-target-box" class="w-36 h-36 bg-white p-2.5 rounded-2xl border-2 border-pine shadow-md flex flex-col items-center justify-center space-y-1.5 group-hover:scale-105 transition transform">
-        <!-- SVG QR Pattern -->
-        <svg viewBox="0 0 100 100" class="w-24 h-24">
-          <rect width="100" height="100" fill="white"/>
-          <rect x="8" y="8" width="28" height="28" fill="#10443e"/>
-          <rect x="14" y="14" width="16" height="16" fill="white"/>
-          <rect x="18" y="18" width="8" height="8" fill="#10443e"/>
-          <rect x="64" y="8" width="28" height="28" fill="#10443e"/>
-          <rect x="70" y="14" width="16" height="16" fill="white"/>
-          <rect x="74" y="18" width="8" height="8" fill="#10443e"/>
-          <rect x="8" y="64" width="28" height="28" fill="#10443e"/>
-          <rect x="14" y="70" width="16" height="16" fill="white"/>
-          <rect x="18" y="74" width="8" height="8" fill="#10443e"/>
-          <rect x="44" y="12" width="10" height="8" fill="#10443e"/>
-          <rect x="44" y="44" width="12" height="12" fill="#10443e"/>
-          <rect x="64" y="48" width="8" height="8" fill="#10443e"/>
-          <rect x="48" y="72" width="16" height="10" fill="#10443e"/>
-          <rect x="72" y="72" width="12" height="12" fill="#10443e"/>
-        </svg>
-        <span class="font-mono text-[9px] font-bold text-pine uppercase tracking-wider">#TM-8402-NSK</span>
+      <!-- Corner guides overlay -->
+      <div class="absolute inset-0 pointer-events-none">
+        <!-- Top-left -->
+        <div class="absolute top-4 left-4 w-7 h-7 border-t-[3px] border-l-[3px] border-sage rounded-tl-md"></div>
+        <!-- Top-right -->
+        <div class="absolute top-4 right-4 w-7 h-7 border-t-[3px] border-r-[3px] border-sage rounded-tr-md"></div>
+        <!-- Bottom-left -->
+        <div class="absolute bottom-4 left-4 w-7 h-7 border-b-[3px] border-l-[3px] border-sage rounded-bl-md"></div>
+        <!-- Bottom-right -->
+        <div class="absolute bottom-4 right-4 w-7 h-7 border-b-[3px] border-r-[3px] border-sage rounded-br-md"></div>
       </div>
 
-      <span id="scan-hint-text" class="font-mono text-[11px] text-pine/70 font-bold mt-3 block group-hover:text-sage transition">
-        Tap here to scan crate tag
-      </span>
+      <!-- Scanning laser -->
+      <div id="laser-line" class="scanner-laser hidden"></div>
+
+      <!-- Idle placeholder (shown before camera starts) -->
+      <div id="camera-idle-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center p-4">
+        <div class="w-16 h-16 rounded-2xl bg-pine/40 border border-sage/40 flex items-center justify-center">
+          <i data-lucide="camera" class="w-8 h-8 text-sage"></i>
+        </div>
+        <p class="font-mono text-[11px] text-linen/70 font-bold">Camera will appear here</p>
+      </div>
+
+      <!-- Status badge -->
+      <div id="scanner-status-badge" class="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-pine/80 backdrop-blur-sm font-mono text-[10px] font-bold text-linen/90 whitespace-nowrap">
+        Press "Start Camera" to scan
+      </div>
     </div>
 
-    <!-- Big Action Button to Open / Start Scanner -->
+    <!-- Camera control buttons -->
     <div class="space-y-3">
-      <button id="btn-start-scan" onclick="triggerFakeScan()" class="w-full py-4 px-6 hand-btn-primary text-base flex items-center justify-center gap-2.5 font-bold shadow-[4px_4px_0px_#10443e]">
-        <i data-lucide="scan-line" class="w-5 h-5"></i>
-        <span id="btn-scan-text">Scan Crate QR Code</span>
+      <button id="btn-start-scan" onclick="toggleScanner()" class="w-full py-4 px-6 hand-btn-primary text-base flex items-center justify-center gap-2.5 font-bold shadow-[4px_4px_0px_#10443e]">
+        <i id="btn-icon" data-lucide="camera" class="w-5 h-5"></i>
+        <span id="btn-scan-text">Start Camera Scanner</span>
       </button>
 
-      <!-- Produce Switcher for Demo -->
+      <!-- Upload fallback -->
+      <label class="w-full py-2.5 px-5 hand-btn-secondary text-sm flex items-center justify-center gap-2 font-bold cursor-pointer">
+        <i data-lucide="upload" class="w-4 h-4 text-ochre"></i>
+        <span>Upload QR Image</span>
+        <input type="file" id="qr-file-input" accept="image/*" class="hidden" onchange="handleQRUpload(event)">
+      </label>
+
+      <!-- Quick Batch demo switcher (kept for demo) -->
       <div class="pt-1 flex items-center justify-center gap-2 text-xs font-mono">
         <span class="text-pine/60 text-[11px]">Quick Batch:</span>
         <button onclick="setSample('tomato')" id="sample-tomato" class="px-2.5 py-1 rounded-lg border border-pine bg-pine text-white font-bold text-[10px]">🍅 Tomatoes</button>
@@ -385,7 +396,7 @@
 
   <!-- Audio and Scan Flow Script -->
   <script>
-    // Audio synthesizer for scan sounds
+    // ── Audio synthesizer ──────────────────────────────────────────────────────
     function playAudioTone(freq = 784, type = 'sine', duration = 0.08) {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -404,141 +415,203 @@
       } catch (e) {}
     }
 
+    // ── Produce demo database (for Quick Batch buttons) ──────────────────────
     const produceDatabase = {
       tomato: {
-        name: "Vine Tomatoes",
-        emoji: "🍅",
-        batchId: "#TM-8402-NSK",
-        freshness: 94,
-        grade: "GRADE A+",
-        days: "1.6",
-        timeSub: "Harvested 38.5 hrs ago (26/10/2026)",
-        custodyCount: 3,
-        stop1: {
-          title: "Farm Gate: Ramesh Patil",
-          desc: "Dindori Taluka, Nashik • 500kg Weighed & Crated",
-          time: "Oct 26, 06:15 IST"
-        },
-        stop2: {
-          title: "Transit: Eicher Truck (MH-15-EG-4412)",
-          desc: "Cold-Chain Maintained • Reusable Puck #TK-09",
-          time: "14 hrs • Avg 18.2°C"
-        },
-        stop3: {
-          title: "Retail: FreshMart Supermarket #42",
-          desc: "Chilled Cabinet: 12.0°C • Active on Shelf",
-          time: "Oct 27, 07:00 IST"
-        },
-        farmer: "Farmer: Ramesh Patil (MH-NSK-4091)",
-        location: "Dindori Taluka, Nashik, Maharashtra",
-        payout: "₹24.50 / kg"
+        name: "Vine Tomatoes", emoji: "🍅", batchId: "#TM-8402-NSK",
+        freshness: 94, grade: "GRADE A+", days: "1.6",
+        timeSub: "Harvested 38.5 hrs ago (26/10/2026)", custodyCount: 3,
+        stop1: { title: "Farm Gate: Ramesh Patil", desc: "Dindori Taluka, Nashik • 500kg Weighed & Crated", time: "Oct 26, 06:15 IST" },
+        stop2: { title: "Transit: Eicher Truck (MH-15-EG-4412)", desc: "Cold-Chain Maintained • Reusable Puck #TK-09", time: "14 hrs • Avg 18.2°C" },
+        stop3: { title: "Retail: FreshMart Supermarket #42", desc: "Chilled Cabinet: 12.0°C • Active on Shelf", time: "Oct 27, 07:00 IST" },
+        farmer: "Farmer: Ramesh Patil (MH-NSK-4091)", location: "Dindori Taluka, Nashik, Maharashtra", payout: "₹24.50 / kg"
       },
       spinach: {
-        name: "Baby Spinach",
-        emoji: "🥬",
-        batchId: "#SP-1094-OTY",
-        freshness: 88,
-        grade: "GRADE A",
-        days: "0.8",
-        timeSub: "Harvested 19.2 hrs ago (27/10/2026)",
-        custodyCount: 3,
-        stop1: {
-          title: "Farm Gate: K. Sundaram",
-          desc: "Ketti Valley, Nilgiris • 200kg Hydro-Cooled",
-          time: "Oct 27, 05:30 IST"
-        },
-        stop2: {
-          title: "Transit: Reefer Van (TN-43-AK-2011)",
-          desc: "Chilled at 4.2°C • Bluetooth Puck #TK-14",
-          time: "8 hrs • Avg 4.5°C"
-        },
-        stop3: {
-          title: "Retail: Nature Basket Mandi #08",
-          desc: "Misted Organic Shelf • Active on Shelf",
-          time: "Oct 27, 18:00 IST"
-        },
-        farmer: "Farmer: K. Sundaram (TN-OTY-2180)",
-        location: "Ketti Valley, Nilgiris, Tamil Nadu",
-        payout: "₹38.00 / kg"
+        name: "Baby Spinach", emoji: "🥬", batchId: "#SP-1094-OTY",
+        freshness: 88, grade: "GRADE A", days: "0.8",
+        timeSub: "Harvested 19.2 hrs ago (27/10/2026)", custodyCount: 3,
+        stop1: { title: "Farm Gate: K. Sundaram", desc: "Ketti Valley, Nilgiris • 200kg Hydro-Cooled", time: "Oct 27, 05:30 IST" },
+        stop2: { title: "Transit: Reefer Van (TN-43-AK-2011)", desc: "Chilled at 4.2°C • Bluetooth Puck #TK-14", time: "8 hrs • Avg 4.5°C" },
+        stop3: { title: "Retail: Nature Basket Mandi #08", desc: "Misted Organic Shelf • Active on Shelf", time: "Oct 27, 18:00 IST" },
+        farmer: "Farmer: K. Sundaram (TN-OTY-2180)", location: "Ketti Valley, Nilgiris, Tamil Nadu", payout: "₹38.00 / kg"
       },
       peppers: {
-        name: "Bell Peppers",
-        emoji: "🫑",
-        batchId: "#BP-5531-SML",
-        freshness: 91,
-        grade: "GRADE A+",
-        days: "1.2",
-        timeSub: "Harvested 28.0 hrs ago (26/10/2026)",
-        custodyCount: 3,
-        stop1: {
-          title: "Farm Gate: Vikram Thakur",
-          desc: "Theog, Shimla • 350kg Graded & Packed",
-          time: "Oct 26, 11:00 IST"
-        },
-        stop2: {
-          title: "Transit: Tata 407 (HP-63-B-8910)",
-          desc: "Ventilated Mountain Transit • Puck #TK-22",
-          time: "11 hrs • Avg 15.0°C"
-        },
-        stop3: {
-          title: "Retail: Reliance Fresh Superstore #19",
-          desc: "Cool Shelf: 14.0°C • Active on Shelf",
-          time: "Oct 27, 09:30 IST"
-        },
-        farmer: "Farmer: Vikram Thakur (HP-SML-7740)",
-        location: "Theog, Shimla, Himachal Pradesh",
-        payout: "₹45.00 / kg"
+        name: "Bell Peppers", emoji: "🫑", batchId: "#BP-5531-SML",
+        freshness: 91, grade: "GRADE A+", days: "1.2",
+        timeSub: "Harvested 28.0 hrs ago (26/10/2026)", custodyCount: 3,
+        stop1: { title: "Farm Gate: Vikram Thakur", desc: "Theog, Shimla • 350kg Graded & Packed", time: "Oct 26, 11:00 IST" },
+        stop2: { title: "Transit: Tata 407 (HP-63-B-8910)", desc: "Ventilated Mountain Transit • Puck #TK-22", time: "11 hrs • Avg 15.0°C" },
+        stop3: { title: "Retail: Reliance Fresh Superstore #19", desc: "Cool Shelf: 14.0°C • Active on Shelf", time: "Oct 27, 09:30 IST" },
+        farmer: "Farmer: Vikram Thakur (HP-SML-7740)", location: "Theog, Shimla, Himachal Pradesh", payout: "₹45.00 / kg"
       }
     };
 
     let selectedKey = 'tomato';
-    let isScanning = false;
 
     function setSample(key) {
       selectedKey = key;
       ['tomato', 'spinach', 'peppers'].forEach(k => {
         const btn = document.getElementById(`sample-${k}`);
-        if (k === key) {
-          btn.className = "px-2.5 py-1 rounded-lg border border-pine bg-pine text-white font-bold text-[10px]";
-        } else {
-          btn.className = "px-2.5 py-1 rounded-lg border border-pine bg-white text-pine font-bold text-[10px]";
-        }
+        btn.className = k === key
+          ? "px-2.5 py-1 rounded-lg border border-pine bg-pine text-white font-bold text-[10px]"
+          : "px-2.5 py-1 rounded-lg border border-pine bg-white text-pine font-bold text-[10px]";
       });
     }
 
-    function triggerFakeScan() {
-      if (isScanning) return;
-      isScanning = true;
+    // ── Live Camera QR Scanner ────────────────────────────────────────────────
+    let cameraStream = null;
+    let scanningLoop = null;
+    let scannerActive = false;
+
+    function setStatus(msg, color = 'text-linen/90') {
+      const el = document.getElementById('scanner-status-badge');
+      if (el) { el.textContent = msg; el.className = `absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-pine/80 backdrop-blur-sm font-mono text-[10px] font-bold whitespace-nowrap ${color}`; }
+    }
+
+    async function toggleScanner() {
+      if (scannerActive) {
+        stopScanner();
+        return;
+      }
+      await startScanner();
+    }
+
+    async function startScanner() {
+      const btnText = document.getElementById('btn-scan-text');
+      const btnIcon = document.getElementById('btn-icon');
+      const placeholder = document.getElementById('camera-idle-placeholder');
+      const laser = document.getElementById('laser-line');
+
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } }
+        });
+        const video = document.getElementById('qr-video');
+        video.srcObject = cameraStream;
+        await video.play();
+
+        placeholder.classList.add('hidden');
+        laser.classList.remove('hidden');
+        scannerActive = true;
+        btnText.textContent = 'Stop Scanner';
+        btnIcon.setAttribute('data-lucide', 'camera-off');
+        if (window.lucide) lucide.createIcons();
+        setStatus('🟢 Scanning — point at QR code');
+
+        // jsQR decode loop
+        const canvas = document.getElementById('qr-canvas');
+        const ctx = canvas.getContext('2d');
+
+        scanningLoop = setInterval(() => {
+          if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+          if (typeof jsQR !== 'undefined') {
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: 'dontInvert'
+            });
+            if (code && code.data) {
+              handleQRResult(code.data);
+            }
+          }
+        }, 150);
+
+      } catch (err) {
+        console.warn('Camera access failed', err);
+        setStatus('⚠ Camera blocked — use Upload below');
+        // Fall back to demo scan
+        triggerDemoScan();
+      }
+    }
+
+    function stopScanner() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+      }
+      clearInterval(scanningLoop);
+      scanningLoop = null;
+      scannerActive = false;
 
       const laser = document.getElementById('laser-line');
-      const hint = document.getElementById('scan-hint-text');
+      const placeholder = document.getElementById('camera-idle-placeholder');
       const btnText = document.getElementById('btn-scan-text');
+      const btnIcon = document.getElementById('btn-icon');
 
+      laser.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+      btnText.textContent = 'Start Camera Scanner';
+      btnIcon.setAttribute('data-lucide', 'camera');
+      if (window.lucide) lucide.createIcons();
+      setStatus('Press "Start Camera" to scan');
+    }
+
+    function handleQRResult(data) {
+      // Stop the scanner immediately
+      stopScanner();
+      playAudioTone(1046, 'sine', 0.15);
+      setStatus('✅ QR Decoded — Opening Passport', 'text-sage');
+
+      // Always open the harvest passport popup.
+      // Try to match a batch ID embedded in the QR data first,
+      // then fall back to the currently selected demo batch.
+      const matchKey = Object.keys(produceDatabase).find(k =>
+        data.includes(produceDatabase[k].batchId.replace('#', ''))
+      );
+      openPassportPopup(matchKey || selectedKey);
+    }
+
+    // ── QR Image Upload fallback ──────────────────────────────────────────────
+    function handleQRUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          if (typeof jsQR !== 'undefined') {
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            if (code && code.data) {
+              handleQRResult(code.data);
+              return;
+            }
+          }
+          // No QR found — open demo passport anyway
+          playAudioTone(784, 'sine', 0.12);
+          openPassportPopup(selectedKey);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      // Reset input so same file can be re-selected
+      event.target.value = '';
+    }
+
+    // ── Demo scan (fallback when camera denied) ───────────────────────────────
+    function triggerDemoScan() {
+      const laser = document.getElementById('laser-line');
       laser.classList.remove('hidden');
-      hint.textContent = "Scanning QR code...";
-      hint.className = "font-mono text-[11px] text-[#e11d48] font-bold mt-3 block animate-pulse";
-      btnText.textContent = "Scanning in progress...";
-
       playAudioTone(587, 'triangle', 0.1);
-
-      // Simulate 1.1s realistic scanning delay
       setTimeout(() => {
-        playAudioTone(1046, 'sine', 0.15); // Scan success beep
+        playAudioTone(1046, 'sine', 0.15);
         laser.classList.add('hidden');
-        hint.textContent = "Tag Decoded!";
-        hint.className = "font-mono text-[11px] text-sage font-bold mt-3 block";
-        btnText.textContent = "Scan Crate QR Code";
-        isScanning = false;
-
-        // Open the Verified Produce Passport Pop-up!
         openPassportPopup(selectedKey);
       }, 1100);
     }
 
+    // ── Passport popup ────────────────────────────────────────────────────────
     function openPassportPopup(key) {
       const data = produceDatabase[key] || produceDatabase['tomato'];
 
-      // Populate pop-up fields
       document.getElementById('crop-label').textContent = data.name;
       document.getElementById('crop-emoji').textContent = data.emoji;
       document.getElementById('passport-batch-badge').textContent = data.batchId;
@@ -567,29 +640,26 @@
       document.getElementById('farmer-location').textContent = data.location;
       document.getElementById('farmer-net-amount').textContent = data.payout;
 
-      // Show the popup modal
       document.getElementById('passport-popup-modal').classList.remove('hidden');
     }
 
     function closePassportPopup() {
       document.getElementById('passport-popup-modal').classList.add('hidden');
-      document.getElementById('scan-hint-text').textContent = "Tap here to scan crate tag";
-      document.getElementById('scan-hint-text').className = "font-mono text-[11px] text-pine/70 font-bold mt-3 block group-hover:text-sage transition";
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
 
-      // Check URL query param ?batch=...
+      // URL param: ?batch=spinach etc.
       const params = new URLSearchParams(window.location.search);
       const batchParam = params.get('batch');
       if (batchParam === 'spinach') setSample('spinach');
       else if (batchParam === 'peppers') setSample('peppers');
       else setSample('tomato');
 
-      // If user came with direct scan intent ?autoscan=1, trigger immediately
+      // ?autoscan=1 — auto-start camera
       if (params.get('autoscan') === '1') {
-        setTimeout(triggerFakeScan, 400);
+        setTimeout(startScanner, 400);
       }
     });
   </script>
