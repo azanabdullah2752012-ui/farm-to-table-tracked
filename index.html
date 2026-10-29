@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GreenMinds · QR Scanner</title>
-  <meta name="description" content="GreenMinds — scan a QR code to visit the site or inspect a harvest passport.">
+  <title>GreenMinds · Verified Harvest Passport</title>
+  <meta name="description" content="GreenMinds — verified produce freshness passport with immutable custody trail.">
 
   <!-- Google Fonts: Fraunces, Plus Jakarta Sans, Space Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,13 +36,12 @@
   </script>
 
   <script src="lucide.min.js"></script>
-  <script src="jsqr.min.js"></script>
   <link rel="stylesheet" href="styles.css">
   <style>
     body {
       background-color: #ede4d6;
-      background-image: 
-        radial-gradient(#10443e 0.7px, transparent 0.7px), 
+      background-image:
+        radial-gradient(#10443e 0.7px, transparent 0.7px),
         radial-gradient(#10443e 0.7px, #ede4d6 0.7px);
       background-size: 24px 24px;
       background-position: 0 0, 12px 12px;
@@ -50,18 +49,11 @@
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     }
 
-    /* Exact screenshot popup styling */
-    .passport-modal-card {
+    .passport-card {
       background: #ffffff;
       border: 2px solid #10443e;
       border-radius: 28px;
       box-shadow: 8px 8px 0px #10443e;
-      animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes popIn {
-      0% { opacity: 0; transform: scale(0.92) translateY(12px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .passport-inner-card {
@@ -75,203 +67,91 @@
       border: 1.5px solid #10443e;
       border-radius: 20px;
     }
-
-    /* Red laser scanner animation */
-    .scanner-laser {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #e11d48, transparent);
-      box-shadow: 0 0 12px 3px rgba(225, 29, 72, 0.8);
-      animation: scanSweep 1.6s ease-in-out infinite alternate;
-    }
-
-    @keyframes scanSweep {
-      0% { top: 10%; opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { top: 90%; opacity: 0.4; }
-    }
   </style>
 </head>
-<body class="min-h-full flex flex-col items-center justify-center p-4 sm:p-6">
+<body class="min-h-full flex flex-col items-center justify-start p-4 sm:p-6 py-8">
 
   <!-- ======================================================== -->
-  <!-- 1. SCANNER INTERFACE (INITIAL SCREEN)                    -->
+  <!-- VERIFIED HARVEST PASSPORT — MAIN PAGE                    -->
   <!-- ======================================================== -->
-  <main id="scanner-interface" class="w-full max-w-md hand-card p-6 sm:p-8 bg-white space-y-6 text-center shadow-[6px_6px_0px_#10443e]">
-    
-    <!-- Header -->
-    <div class="space-y-2">
+  <main class="w-full max-w-2xl space-y-5">
+
+    <!-- Top bar: brand pill + batch switcher -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
       <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f2ece1] border border-pine text-xs font-mono font-bold text-pine">
         <span class="w-2 h-2 rounded-full bg-sage animate-ping"></span>
         <span>GreenMinds</span>
       </div>
-      
-      <h1 class="font-display text-3xl font-extrabold text-pine">
-        QR Code Scanner
-      </h1>
-      
-      <p class="text-xs text-pine/75 max-w-xs mx-auto">
-        Point your camera at a GreenMinds QR code to be redirected instantly, or scan a crate tag to inspect the harvest passport.
-      </p>
-    </div>
-
-    <!-- Live Camera Scanner Viewfinder -->
-    <div class="relative w-full aspect-square max-w-[280px] mx-auto rounded-3xl bg-[#0a0f0d] border-2 border-pine overflow-hidden shadow-inner">
-      
-      <!-- Video feed -->
-      <video id="qr-video" playsinline class="absolute inset-0 w-full h-full object-cover"></video>
-      <!-- Hidden canvas for jsQR processing -->
-      <canvas id="qr-canvas" class="hidden"></canvas>
-
-      <!-- Corner guides overlay -->
-      <div class="absolute inset-0 pointer-events-none">
-        <!-- Top-left -->
-        <div class="absolute top-4 left-4 w-7 h-7 border-t-[3px] border-l-[3px] border-sage rounded-tl-md"></div>
-        <!-- Top-right -->
-        <div class="absolute top-4 right-4 w-7 h-7 border-t-[3px] border-r-[3px] border-sage rounded-tr-md"></div>
-        <!-- Bottom-left -->
-        <div class="absolute bottom-4 left-4 w-7 h-7 border-b-[3px] border-l-[3px] border-sage rounded-bl-md"></div>
-        <!-- Bottom-right -->
-        <div class="absolute bottom-4 right-4 w-7 h-7 border-b-[3px] border-r-[3px] border-sage rounded-br-md"></div>
-      </div>
-
-      <!-- Scanning laser -->
-      <div id="laser-line" class="scanner-laser hidden"></div>
-
-      <!-- Idle placeholder (shown before camera starts) -->
-      <div id="camera-idle-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center p-4">
-        <div class="w-16 h-16 rounded-2xl bg-pine/40 border border-sage/40 flex items-center justify-center">
-          <i data-lucide="camera" class="w-8 h-8 text-sage"></i>
-        </div>
-        <p class="font-mono text-[11px] text-linen/70 font-bold">Camera will appear here</p>
-      </div>
-
-      <!-- Status badge -->
-      <div id="scanner-status-badge" class="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-pine/80 backdrop-blur-sm font-mono text-[10px] font-bold text-linen/90 whitespace-nowrap">
-        Press "Start Camera" to scan
+      <!-- Batch switcher -->
+      <div class="flex items-center gap-2 text-xs font-mono">
+        <span class="text-pine/60 text-[11px]">Switch batch:</span>
+        <button onclick="loadPassport('tomato')" id="sample-tomato" class="px-2.5 py-1 rounded-lg border border-pine bg-pine text-white font-bold text-[10px]">🍅 Tomatoes</button>
+        <button onclick="loadPassport('spinach')" id="sample-spinach" class="px-2.5 py-1 rounded-lg border border-pine bg-white text-pine font-bold text-[10px]">🥬 Spinach</button>
+        <button onclick="loadPassport('peppers')" id="sample-peppers" class="px-2.5 py-1 rounded-lg border border-pine bg-white text-pine font-bold text-[10px]">🫑 Peppers</button>
       </div>
     </div>
 
-    <!-- Camera control buttons -->
-    <div class="space-y-3">
-      <button id="btn-start-scan" onclick="toggleScanner()" class="w-full py-4 px-6 hand-btn-primary text-base flex items-center justify-center gap-2.5 font-bold shadow-[4px_4px_0px_#10443e]">
-        <i id="btn-icon" data-lucide="camera" class="w-5 h-5"></i>
-        <span id="btn-scan-text">Start Camera Scanner</span>
-      </button>
+    <!-- Passport card -->
+    <div class="passport-card p-6 sm:p-9 space-y-6">
 
-      <!-- Upload fallback -->
-      <label class="w-full py-2.5 px-5 hand-btn-secondary text-sm flex items-center justify-center gap-2 font-bold cursor-pointer">
-        <i data-lucide="upload" class="w-4 h-4 text-ochre"></i>
-        <span>Upload QR Image</span>
-        <input type="file" id="qr-file-input" accept="image/*" class="hidden" onchange="handleQRUpload(event)">
-      </label>
-
-      <!-- Quick Batch demo switcher (kept for demo) -->
-      <div class="pt-1 flex items-center justify-center gap-2 text-xs font-mono">
-        <span class="text-pine/60 text-[11px]">Quick Batch:</span>
-        <button onclick="setSample('tomato')" id="sample-tomato" class="px-2.5 py-1 rounded-lg border border-pine bg-pine text-white font-bold text-[10px]">🍅 Tomatoes</button>
-        <button onclick="setSample('spinach')" id="sample-spinach" class="px-2.5 py-1 rounded-lg border border-pine bg-white text-pine font-bold text-[10px]">🥬 Spinach</button>
-        <button onclick="setSample('peppers')" id="sample-peppers" class="px-2.5 py-1 rounded-lg border border-pine bg-white text-pine font-bold text-[10px]">🫑 Peppers</button>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- ======================================================== -->
-  <!-- 2. THE POP-UP: EXACT VERIFIED PRODUCE PASSPORT           -->
-  <!-- ======================================================== -->
-  <div id="passport-popup-modal" class="fixed inset-0 bg-pine/65 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-    
-    <div class="w-full max-w-2xl passport-modal-card p-6 sm:p-9 space-y-6 relative my-auto">
-      
-      <!-- Close / Rescan Button on Top Right -->
-      <button onclick="closePassportPopup()" class="absolute top-4 right-4 w-9 h-9 rounded-full border-2 border-pine bg-[#f7f3ec] hover:bg-pine hover:text-white font-bold flex items-center justify-center text-lg transition shadow-sm z-10" title="Close and scan another crate">
-        &times;
-      </button>
-
-      <!-- 1. PASSPORT TOP HEADER -->
+      <!-- 1. HEADER -->
       <div class="space-y-3 pb-4 border-b border-pine/20">
-        <div class="flex flex-wrap items-start justify-between gap-3 pr-8 sm:pr-0">
-          
+        <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
             <span class="font-mono text-[11px] tracking-wider uppercase font-bold text-[#b29361] block mb-1">
               VERIFIED PRODUCE PASSPORT
             </span>
-            <h2 id="passport-crop-name" class="font-display text-3xl sm:text-4xl font-extrabold text-pine flex items-center gap-2">
+            <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-pine flex items-center gap-2">
               <span id="crop-label">Vine Tomatoes</span>
               <span id="crop-emoji" class="text-3xl">🍅</span>
-            </h2>
+            </h1>
           </div>
-
-          <!-- Badges on Top Right -->
           <div class="flex items-center gap-2 self-start pt-1">
             <div class="px-3 py-1.5 rounded-xl border border-pine bg-[#f5f1e8] font-mono text-xs font-bold text-pine flex items-center gap-1">
               <span class="text-pine/70 font-normal">BATCH</span>
               <span id="passport-batch-badge" class="font-black">#TM-8402-NSK</span>
             </div>
-
             <div class="px-3 py-1.5 rounded-xl border border-sage bg-[#eef5f1] font-mono text-xs font-bold text-sage flex items-center gap-1">
               <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sage"></i>
               <span>VERIFIED</span>
             </div>
           </div>
-
         </div>
       </div>
 
-      <!-- 2. ROW OF 3 STAT CARDS -->
+      <!-- 2. STAT CARDS -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-        
-        <!-- Card 1: Freshness Index -->
+
+        <!-- Freshness Index -->
         <div class="passport-inner-card p-4 space-y-2">
-          <span class="font-mono text-xs font-medium text-pine/75 block">
-            Freshness Index
-          </span>
+          <span class="font-mono text-xs font-medium text-pine/75 block">Freshness Index</span>
           <div class="flex items-baseline gap-2">
-            <span id="passport-freshness-pct" class="font-display text-3xl sm:text-4xl font-black text-pine">
-              94%
-            </span>
-            <span id="passport-freshness-grade" class="font-mono text-[11px] font-bold text-sage">
-              GRADE A+
-            </span>
+            <span id="passport-freshness-pct" class="font-display text-3xl sm:text-4xl font-black text-pine">94%</span>
+            <span id="passport-freshness-grade" class="font-mono text-[11px] font-bold text-sage">GRADE A+</span>
           </div>
           <div class="w-full bg-[#e2dbce] rounded-full h-2.5 overflow-hidden border border-pine/30">
             <div id="passport-freshness-bar" class="bg-sage h-full rounded-full transition-all duration-500" style="width: 94%;"></div>
           </div>
         </div>
 
-        <!-- Card 2: Time Elapsed -->
+        <!-- Time Elapsed -->
         <div class="passport-inner-card p-4 space-y-1">
-          <span class="font-mono text-xs font-medium text-pine/75 block">
-            Time Elapsed
-          </span>
+          <span class="font-mono text-xs font-medium text-pine/75 block">Time Elapsed</span>
           <div class="flex items-baseline gap-1.5">
-            <span id="passport-time-days" class="font-display text-3xl sm:text-4xl font-black text-pine">
-              1.6
-            </span>
-            <span class="font-mono text-xs font-bold text-pine/80">
-              DAYS
-            </span>
+            <span id="passport-time-days" class="font-display text-3xl sm:text-4xl font-black text-pine">1.6</span>
+            <span class="font-mono text-xs font-bold text-pine/80">DAYS</span>
           </div>
           <p id="passport-time-sub" class="font-mono text-[11px] text-pine/70 leading-tight pt-1">
             Harvested 38.5 hrs ago (26/10/2026)
           </p>
         </div>
 
-        <!-- Card 3: Custody Stops -->
+        <!-- Custody Stops -->
         <div class="passport-inner-card p-4 space-y-1">
-          <span class="font-mono text-xs font-medium text-pine/75 block">
-            Custody Stops
-          </span>
+          <span class="font-mono text-xs font-medium text-pine/75 block">Custody Stops</span>
           <div class="flex items-baseline gap-1.5">
-            <span id="passport-custody-num" class="font-display text-3xl sm:text-4xl font-black text-pine">
-              3
-            </span>
-            <span class="font-mono text-xs font-bold text-pine/80">
-              CHECKPOINTS
-            </span>
+            <span id="passport-custody-num" class="font-display text-3xl sm:text-4xl font-black text-pine">3</span>
+            <span class="font-mono text-xs font-bold text-pine/80">CHECKPOINTS</span>
           </div>
           <div class="flex items-center gap-1 font-mono text-[11px] text-sage font-bold pt-1">
             <i data-lucide="check" class="w-3.5 h-3.5"></i>
@@ -281,386 +161,151 @@
 
       </div>
 
-      <!-- 3. IMMUTABLE CUSTODY TRAIL BOX -->
+      <!-- 3. IMMUTABLE CUSTODY TRAIL -->
       <div class="passport-inner-card p-5 sm:p-6 space-y-4">
         <span class="font-mono text-xs uppercase font-bold tracking-wider text-pine block border-b border-pine/10 pb-2">
           IMMUTABLE CUSTODY TRAIL:
         </span>
-
         <div class="space-y-4">
-          
-          <!-- Stop 1: Farm Gate -->
+
+          <!-- Stop 1 -->
           <div class="flex items-start justify-between gap-3 text-xs">
             <div class="flex items-start gap-3">
-              <div class="w-5 h-5 rounded-full bg-pine text-white font-mono font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5">
-                1
-              </div>
+              <div class="w-5 h-5 rounded-full bg-pine text-white font-mono font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5">1</div>
               <div>
-                <div class="font-bold text-pine text-sm" id="trail-stop1-title">
-                  Farm Gate: Ramesh Patil
-                </div>
-                <div class="font-mono text-pine/70 text-[11px] mt-0.5" id="trail-stop1-desc">
-                  Dindori Taluka, Nashik &bull; 500kg Weighed &amp; Crated
-                </div>
+                <div class="font-bold text-pine text-sm" id="trail-stop1-title">Farm Gate: Ramesh Patil</div>
+                <div class="font-mono text-pine/70 text-[11px] mt-0.5" id="trail-stop1-desc">Dindori Taluka, Nashik &bull; 500kg Weighed &amp; Crated</div>
               </div>
             </div>
-            <div class="font-mono text-[11px] text-pine/80 font-semibold text-right shrink-0" id="trail-stop1-time">
-              Oct 26, 06:15 IST
-            </div>
+            <div class="font-mono text-[11px] text-pine/80 font-semibold text-right shrink-0" id="trail-stop1-time">Oct 26, 06:15 IST</div>
           </div>
 
-          <!-- Stop 2: Transit -->
+          <!-- Stop 2 -->
           <div class="flex items-start justify-between gap-3 text-xs">
             <div class="flex items-start gap-3">
-              <div class="w-5 h-5 rounded-full bg-[#b29361] text-white font-mono font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5">
-                2
-              </div>
+              <div class="w-5 h-5 rounded-full bg-[#b29361] text-white font-mono font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5">2</div>
               <div>
-                <div class="font-bold text-pine text-sm" id="trail-stop2-title">
-                  Transit: Eicher Truck (MH-15-EG-4412)
-                </div>
-                <div class="font-mono text-pine/70 text-[11px] mt-0.5" id="trail-stop2-desc">
-                  Cold-Chain Maintained &bull; Reusable Puck #TK-09
-                </div>
+                <div class="font-bold text-pine text-sm" id="trail-stop2-title">Transit: Eicher Truck (MH-15-EG-4412)</div>
+                <div class="font-mono text-pine/70 text-[11px] mt-0.5" id="trail-stop2-desc">Cold-Chain Maintained &bull; Reusable Puck #TK-09</div>
               </div>
             </div>
-            <div class="font-mono text-[11px] text-sage font-bold text-right shrink-0" id="trail-stop2-time">
-              14 hrs &bull; Avg 18.2&deg;C
-            </div>
+            <div class="font-mono text-[11px] text-sage font-bold text-right shrink-0" id="trail-stop2-time">14 hrs &bull; Avg 18.2&deg;C</div>
           </div>
 
-          <!-- Stop 3: Retail -->
+          <!-- Stop 3 -->
           <div class="flex items-start justify-between gap-3 text-xs">
             <div class="flex items-start gap-3">
-              <div class="w-5 h-5 rounded-full bg-sage text-white font-mono font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5">
-                3
-              </div>
+              <div class="w-5 h-5 rounded-full bg-sage text-white font-mono font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5">3</div>
               <div>
-                <div class="font-bold text-pine text-sm" id="trail-stop3-title">
-                  Retail: FreshMart Supermarket #42
-                </div>
-                <div class="font-mono text-pine/70 text-[11px] mt-0.5" id="trail-stop3-desc">
-                  Chilled Cabinet: 12.0&deg;C &bull; Active on Shelf
-                </div>
+                <div class="font-bold text-pine text-sm" id="trail-stop3-title">Retail: FreshMart Supermarket #42</div>
+                <div class="font-mono text-pine/70 text-[11px] mt-0.5" id="trail-stop3-desc">Chilled Cabinet: 12.0&deg;C &bull; Active on Shelf</div>
               </div>
             </div>
-            <div class="font-mono text-[11px] text-pine/80 font-semibold text-right shrink-0" id="trail-stop3-time">
-              Oct 27, 07:00 IST
-            </div>
+            <div class="font-mono text-[11px] text-pine/80 font-semibold text-right shrink-0" id="trail-stop3-time">Oct 27, 07:00 IST</div>
           </div>
 
         </div>
       </div>
 
-      <!-- 4. BOTTOM FARMER & PAYOUT BOX -->
+      <!-- 4. FARMER & PAYOUT -->
       <div class="passport-payout-card p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-        
         <div class="flex items-center gap-3.5 text-center sm:text-left">
-          <!-- Farmer Avatar -->
-          <div class="w-12 h-12 rounded-full bg-white border-2 border-pine flex items-center justify-center text-2xl shadow-sm shrink-0">
-            👨🏽‍🌾
-          </div>
+          <div class="w-12 h-12 rounded-full bg-white border-2 border-pine flex items-center justify-center text-2xl shadow-sm shrink-0">👨🏽‍🌾</div>
           <div>
-            <h3 id="farmer-title" class="font-display text-base sm:text-lg font-bold text-pine">
-              Farmer: Ramesh Patil (MH-NSK-4091)
-            </h3>
-            <p id="farmer-location" class="font-mono text-xs text-pine/75">
-              Dindori Taluka, Nashik, Maharashtra
-            </p>
+            <h3 id="farmer-title" class="font-display text-base sm:text-lg font-bold text-pine">Farmer: Ramesh Patil (MH-NSK-4091)</h3>
+            <p id="farmer-location" class="font-mono text-xs text-pine/75">Dindori Taluka, Nashik, Maharashtra</p>
           </div>
         </div>
-
-        <!-- Farmer Net Payout -->
         <div class="text-center sm:text-right shrink-0 font-mono">
-          <span class="text-[10px] uppercase font-bold text-pine/70 block tracking-wider">
-            Farmer Net Payout:
-          </span>
-          <span id="farmer-net-amount" class="font-display text-2xl sm:text-3xl font-black text-sage block mt-0.5">
-            ₹24.50 / kg
-          </span>
+          <span class="text-[10px] uppercase font-bold text-pine/70 block tracking-wider">Farmer Net Payout:</span>
+          <span id="farmer-net-amount" class="font-display text-2xl sm:text-3xl font-black text-sage block mt-0.5">&#8377;24.50 / kg</span>
         </div>
-
       </div>
 
-      <!-- Bottom action button to re-scan -->
-      <div class="pt-1 text-center">
-        <button onclick="closePassportPopup()" class="hand-btn-secondary px-5 py-2 text-xs font-mono font-bold inline-flex items-center gap-1.5">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-sage"></i>
-          <span>Scan Another Crate Tag</span>
-        </button>
-      </div>
+    </div><!-- /passport card -->
+  </main>
 
-    </div>
-
-  </div>
-
-  <!-- Audio and Scan Flow Script -->
   <script>
-    // ── Audio synthesizer ──────────────────────────────────────────────────────
-    function playAudioTone(freq = 784, type = 'sine', duration = 0.08) {
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        gain.gain.setValueAtTime(0.08, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + duration);
-      } catch (e) {}
-    }
-
-    // ── Produce demo database (for Quick Batch buttons) ──────────────────────
     const produceDatabase = {
       tomato: {
-        name: "Vine Tomatoes", emoji: "🍅", batchId: "#TM-8402-NSK",
-        freshness: 94, grade: "GRADE A+", days: "1.6",
-        timeSub: "Harvested 38.5 hrs ago (26/10/2026)", custodyCount: 3,
-        stop1: { title: "Farm Gate: Ramesh Patil", desc: "Dindori Taluka, Nashik • 500kg Weighed & Crated", time: "Oct 26, 06:15 IST" },
-        stop2: { title: "Transit: Eicher Truck (MH-15-EG-4412)", desc: "Cold-Chain Maintained • Reusable Puck #TK-09", time: "14 hrs • Avg 18.2°C" },
-        stop3: { title: "Retail: FreshMart Supermarket #42", desc: "Chilled Cabinet: 12.0°C • Active on Shelf", time: "Oct 27, 07:00 IST" },
-        farmer: "Farmer: Ramesh Patil (MH-NSK-4091)", location: "Dindori Taluka, Nashik, Maharashtra", payout: "₹24.50 / kg"
+        name: 'Vine Tomatoes', emoji: '🍅', batchId: '#TM-8402-NSK',
+        freshness: 94, grade: 'GRADE A+', days: '1.6',
+        timeSub: 'Harvested 38.5 hrs ago (26/10/2026)', custodyCount: 3,
+        stop1: { title: 'Farm Gate: Ramesh Patil',            desc: 'Dindori Taluka, Nashik \u2022 500kg Weighed & Crated',          time: 'Oct 26, 06:15 IST' },
+        stop2: { title: 'Transit: Eicher Truck (MH-15-EG-4412)', desc: 'Cold-Chain Maintained \u2022 Reusable Puck #TK-09',          time: '14 hrs \u2022 Avg 18.2\u00b0C' },
+        stop3: { title: 'Retail: FreshMart Supermarket #42',   desc: 'Chilled Cabinet: 12.0\u00b0C \u2022 Active on Shelf',           time: 'Oct 27, 07:00 IST' },
+        farmer: 'Farmer: Ramesh Patil (MH-NSK-4091)', location: 'Dindori Taluka, Nashik, Maharashtra', payout: '\u20b924.50 / kg'
       },
       spinach: {
-        name: "Baby Spinach", emoji: "🥬", batchId: "#SP-1094-OTY",
-        freshness: 88, grade: "GRADE A", days: "0.8",
-        timeSub: "Harvested 19.2 hrs ago (27/10/2026)", custodyCount: 3,
-        stop1: { title: "Farm Gate: K. Sundaram", desc: "Ketti Valley, Nilgiris • 200kg Hydro-Cooled", time: "Oct 27, 05:30 IST" },
-        stop2: { title: "Transit: Reefer Van (TN-43-AK-2011)", desc: "Chilled at 4.2°C • Bluetooth Puck #TK-14", time: "8 hrs • Avg 4.5°C" },
-        stop3: { title: "Retail: Nature Basket Mandi #08", desc: "Misted Organic Shelf • Active on Shelf", time: "Oct 27, 18:00 IST" },
-        farmer: "Farmer: K. Sundaram (TN-OTY-2180)", location: "Ketti Valley, Nilgiris, Tamil Nadu", payout: "₹38.00 / kg"
+        name: 'Baby Spinach', emoji: '🥬', batchId: '#SP-1094-OTY',
+        freshness: 88, grade: 'GRADE A', days: '0.8',
+        timeSub: 'Harvested 19.2 hrs ago (27/10/2026)', custodyCount: 3,
+        stop1: { title: 'Farm Gate: K. Sundaram',             desc: 'Ketti Valley, Nilgiris \u2022 200kg Hydro-Cooled',             time: 'Oct 27, 05:30 IST' },
+        stop2: { title: 'Transit: Reefer Van (TN-43-AK-2011)', desc: 'Chilled at 4.2\u00b0C \u2022 Bluetooth Puck #TK-14',          time: '8 hrs \u2022 Avg 4.5\u00b0C' },
+        stop3: { title: 'Retail: Nature Basket Mandi #08',    desc: 'Misted Organic Shelf \u2022 Active on Shelf',                 time: 'Oct 27, 18:00 IST' },
+        farmer: 'Farmer: K. Sundaram (TN-OTY-2180)', location: 'Ketti Valley, Nilgiris, Tamil Nadu', payout: '\u20b938.00 / kg'
       },
       peppers: {
-        name: "Bell Peppers", emoji: "🫑", batchId: "#BP-5531-SML",
-        freshness: 91, grade: "GRADE A+", days: "1.2",
-        timeSub: "Harvested 28.0 hrs ago (26/10/2026)", custodyCount: 3,
-        stop1: { title: "Farm Gate: Vikram Thakur", desc: "Theog, Shimla • 350kg Graded & Packed", time: "Oct 26, 11:00 IST" },
-        stop2: { title: "Transit: Tata 407 (HP-63-B-8910)", desc: "Ventilated Mountain Transit • Puck #TK-22", time: "11 hrs • Avg 15.0°C" },
-        stop3: { title: "Retail: Reliance Fresh Superstore #19", desc: "Cool Shelf: 14.0°C • Active on Shelf", time: "Oct 27, 09:30 IST" },
-        farmer: "Farmer: Vikram Thakur (HP-SML-7740)", location: "Theog, Shimla, Himachal Pradesh", payout: "₹45.00 / kg"
+        name: 'Bell Peppers', emoji: '🫑', batchId: '#BP-5531-SML',
+        freshness: 91, grade: 'GRADE A+', days: '1.2',
+        timeSub: 'Harvested 28.0 hrs ago (26/10/2026)', custodyCount: 3,
+        stop1: { title: 'Farm Gate: Vikram Thakur',           desc: 'Theog, Shimla \u2022 350kg Graded & Packed',                  time: 'Oct 26, 11:00 IST' },
+        stop2: { title: 'Transit: Tata 407 (HP-63-B-8910)',   desc: 'Ventilated Mountain Transit \u2022 Puck #TK-22',              time: '11 hrs \u2022 Avg 15.0\u00b0C' },
+        stop3: { title: 'Retail: Reliance Fresh Superstore #19', desc: 'Cool Shelf: 14.0\u00b0C \u2022 Active on Shelf',            time: 'Oct 27, 09:30 IST' },
+        farmer: 'Farmer: Vikram Thakur (HP-SML-7740)', location: 'Theog, Shimla, Himachal Pradesh', payout: '\u20b945.00 / kg'
       }
     };
 
-    let selectedKey = 'tomato';
+    let activeKey = 'tomato';
 
-    function setSample(key) {
-      selectedKey = key;
+    function loadPassport(key) {
+      activeKey = key;
+      const d = produceDatabase[key];
+
+      // Switcher button styles
       ['tomato', 'spinach', 'peppers'].forEach(k => {
-        const btn = document.getElementById(`sample-${k}`);
+        const btn = document.getElementById('sample-' + k);
         btn.className = k === key
-          ? "px-2.5 py-1 rounded-lg border border-pine bg-pine text-white font-bold text-[10px]"
-          : "px-2.5 py-1 rounded-lg border border-pine bg-white text-pine font-bold text-[10px]";
+          ? 'px-2.5 py-1 rounded-lg border border-pine bg-pine text-white font-bold text-[10px]'
+          : 'px-2.5 py-1 rounded-lg border border-pine bg-white text-pine font-bold text-[10px]';
       });
-    }
 
-    // ── Live Camera QR Scanner ────────────────────────────────────────────────
-    let cameraStream = null;
-    let scanningLoop = null;
-    let scannerActive = false;
+      document.getElementById('crop-label').textContent              = d.name;
+      document.getElementById('crop-emoji').textContent              = d.emoji;
+      document.getElementById('passport-batch-badge').textContent    = d.batchId;
 
-    function setStatus(msg, color = 'text-linen/90') {
-      const el = document.getElementById('scanner-status-badge');
-      if (el) { el.textContent = msg; el.className = `absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-pine/80 backdrop-blur-sm font-mono text-[10px] font-bold whitespace-nowrap ${color}`; }
-    }
+      document.getElementById('passport-freshness-pct').textContent  = d.freshness + '%';
+      document.getElementById('passport-freshness-grade').textContent = d.grade;
+      document.getElementById('passport-freshness-bar').style.width  = d.freshness + '%';
 
-    async function toggleScanner() {
-      if (scannerActive) {
-        stopScanner();
-        return;
-      }
-      await startScanner();
-    }
+      document.getElementById('passport-time-days').textContent      = d.days;
+      document.getElementById('passport-time-sub').textContent       = d.timeSub;
+      document.getElementById('passport-custody-num').textContent    = d.custodyCount;
 
-    async function startScanner() {
-      const btnText = document.getElementById('btn-scan-text');
-      const btnIcon = document.getElementById('btn-icon');
-      const placeholder = document.getElementById('camera-idle-placeholder');
-      const laser = document.getElementById('laser-line');
+      document.getElementById('trail-stop1-title').textContent       = d.stop1.title;
+      document.getElementById('trail-stop1-desc').textContent        = d.stop1.desc;
+      document.getElementById('trail-stop1-time').textContent        = d.stop1.time;
 
-      try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } }
-        });
-        const video = document.getElementById('qr-video');
-        video.srcObject = cameraStream;
-        await video.play();
+      document.getElementById('trail-stop2-title').textContent       = d.stop2.title;
+      document.getElementById('trail-stop2-desc').textContent        = d.stop2.desc;
+      document.getElementById('trail-stop2-time').textContent        = d.stop2.time;
 
-        placeholder.classList.add('hidden');
-        laser.classList.remove('hidden');
-        scannerActive = true;
-        btnText.textContent = 'Stop Scanner';
-        btnIcon.setAttribute('data-lucide', 'camera-off');
-        if (window.lucide) lucide.createIcons();
-        setStatus('🟢 Scanning — point at QR code');
+      document.getElementById('trail-stop3-title').textContent       = d.stop3.title;
+      document.getElementById('trail-stop3-desc').textContent        = d.stop3.desc;
+      document.getElementById('trail-stop3-time').textContent        = d.stop3.time;
 
-        // jsQR decode loop
-        const canvas = document.getElementById('qr-canvas');
-        const ctx = canvas.getContext('2d');
-
-        scanningLoop = setInterval(() => {
-          if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) return;
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-          if (typeof jsQR !== 'undefined') {
-            const code = jsQR(imageData.data, imageData.width, imageData.height, {
-              inversionAttempts: 'dontInvert'
-            });
-            if (code && code.data) {
-              handleQRResult(code.data);
-            }
-          }
-        }, 150);
-
-      } catch (err) {
-        console.warn('Camera access failed', err);
-        setStatus('⚠ Camera blocked — use Upload below');
-        // Fall back to demo scan
-        triggerDemoScan();
-      }
-    }
-
-    function stopScanner() {
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(t => t.stop());
-        cameraStream = null;
-      }
-      clearInterval(scanningLoop);
-      scanningLoop = null;
-      scannerActive = false;
-
-      const laser = document.getElementById('laser-line');
-      const placeholder = document.getElementById('camera-idle-placeholder');
-      const btnText = document.getElementById('btn-scan-text');
-      const btnIcon = document.getElementById('btn-icon');
-
-      laser.classList.add('hidden');
-      placeholder.classList.remove('hidden');
-      btnText.textContent = 'Start Camera Scanner';
-      btnIcon.setAttribute('data-lucide', 'camera');
-      if (window.lucide) lucide.createIcons();
-      setStatus('Press "Start Camera" to scan');
-    }
-
-    function handleQRResult(data) {
-      // Stop the scanner immediately
-      stopScanner();
-      playAudioTone(1046, 'sine', 0.15);
-      setStatus('✅ QR Decoded — Opening Passport', 'text-sage');
-
-      // Always open the harvest passport popup.
-      // Try to match a batch ID embedded in the QR data first,
-      // then fall back to the currently selected demo batch.
-      const matchKey = Object.keys(produceDatabase).find(k =>
-        data.includes(produceDatabase[k].batchId.replace('#', ''))
-      );
-      openPassportPopup(matchKey || selectedKey);
-    }
-
-    // ── QR Image Upload fallback ──────────────────────────────────────────────
-    function handleQRUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          if (typeof jsQR !== 'undefined') {
-            const code = jsQR(imageData.data, imageData.width, imageData.height);
-            if (code && code.data) {
-              handleQRResult(code.data);
-              return;
-            }
-          }
-          // No QR found — open demo passport anyway
-          playAudioTone(784, 'sine', 0.12);
-          openPassportPopup(selectedKey);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-      // Reset input so same file can be re-selected
-      event.target.value = '';
-    }
-
-    // ── Demo scan (fallback when camera denied) ───────────────────────────────
-    function triggerDemoScan() {
-      const laser = document.getElementById('laser-line');
-      laser.classList.remove('hidden');
-      playAudioTone(587, 'triangle', 0.1);
-      setTimeout(() => {
-        playAudioTone(1046, 'sine', 0.15);
-        laser.classList.add('hidden');
-        openPassportPopup(selectedKey);
-      }, 1100);
-    }
-
-    // ── Passport popup ────────────────────────────────────────────────────────
-    function openPassportPopup(key) {
-      const data = produceDatabase[key] || produceDatabase['tomato'];
-
-      document.getElementById('crop-label').textContent = data.name;
-      document.getElementById('crop-emoji').textContent = data.emoji;
-      document.getElementById('passport-batch-badge').textContent = data.batchId;
-
-      document.getElementById('passport-freshness-pct').textContent = `${data.freshness}%`;
-      document.getElementById('passport-freshness-grade').textContent = data.grade;
-      document.getElementById('passport-freshness-bar').style.width = `${data.freshness}%`;
-
-      document.getElementById('passport-time-days').textContent = data.days;
-      document.getElementById('passport-time-sub').textContent = data.timeSub;
-      document.getElementById('passport-custody-num').textContent = data.custodyCount;
-
-      document.getElementById('trail-stop1-title').textContent = data.stop1.title;
-      document.getElementById('trail-stop1-desc').textContent = data.stop1.desc;
-      document.getElementById('trail-stop1-time').textContent = data.stop1.time;
-
-      document.getElementById('trail-stop2-title').textContent = data.stop2.title;
-      document.getElementById('trail-stop2-desc').textContent = data.stop2.desc;
-      document.getElementById('trail-stop2-time').textContent = data.stop2.time;
-
-      document.getElementById('trail-stop3-title').textContent = data.stop3.title;
-      document.getElementById('trail-stop3-desc').textContent = data.stop3.desc;
-      document.getElementById('trail-stop3-time').textContent = data.stop3.time;
-
-      document.getElementById('farmer-title').textContent = data.farmer;
-      document.getElementById('farmer-location').textContent = data.location;
-      document.getElementById('farmer-net-amount').textContent = data.payout;
-
-      document.getElementById('passport-popup-modal').classList.remove('hidden');
-    }
-
-    function closePassportPopup() {
-      document.getElementById('passport-popup-modal').classList.add('hidden');
+      document.getElementById('farmer-title').textContent            = d.farmer;
+      document.getElementById('farmer-location').textContent         = d.location;
+      document.getElementById('farmer-net-amount').textContent       = d.payout;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
 
-      // URL param: ?batch=spinach etc.
+      // Support ?batch=spinach etc. from a QR code link
       const params = new URLSearchParams(window.location.search);
-      const batchParam = params.get('batch');
-      if (batchParam === 'spinach') setSample('spinach');
-      else if (batchParam === 'peppers') setSample('peppers');
-      else setSample('tomato');
-
-      // ?autoscan=1 — auto-start camera
-      if (params.get('autoscan') === '1') {
-        setTimeout(startScanner, 400);
-      }
+      const b = params.get('batch');
+      loadPassport(b === 'spinach' || b === 'peppers' ? b : 'tomato');
     });
   </script>
 </body>
